@@ -1218,6 +1218,48 @@ html.app #intro,html.app .msheet{scrollbar-width:thin;scrollbar-color:rgba(63,81
 html.app::-webkit-scrollbar,html.app #intro::-webkit-scrollbar,html.app .msheet::-webkit-scrollbar{width:5px}
 html.app::-webkit-scrollbar-track,html.app #intro::-webkit-scrollbar-track,html.app .msheet::-webkit-scrollbar-track{background:transparent}
 html.app::-webkit-scrollbar-thumb,html.app #intro::-webkit-scrollbar-thumb,html.app .msheet::-webkit-scrollbar-thumb{background:rgba(63,81,230,.45);border-radius:3px}
+
+/* 실제 위치: 큰 지도 + 큰 로드뷰 */
+.arwrap.lvwrap{align-items:start}
+.lv{display:grid;grid-template-rows:minmax(420px,62vh) minmax(300px,44vh);gap:16px}
+.lv-map,.lv-rv{position:relative;border-radius:18px;overflow:hidden;background:#E9ECF7;box-shadow:0 1px 0 var(--line)}
+.lv-map .rd-map{position:absolute;inset:0;height:auto;border-radius:0}
+.lv.sos .lv-map{box-shadow:inset 0 0 0 3px #E5484D}
+.lv-top{position:absolute;left:12px;right:12px;top:12px;display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;z-index:5;pointer-events:none}
+.lv-top>*{pointer-events:auto}
+.lv-chip{display:flex;flex-direction:column;gap:1px;padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.94);box-shadow:0 4px 14px rgba(17,25,90,.12);font-size:12px;color:var(--muted)}
+.lv-chip b{font:500 11px var(--mono);letter-spacing:.14em;color:var(--ink)}
+.lv-chip .rec{display:inline-block;width:7px;height:7px;border-radius:50%;background:#E5484D;margin-right:6px;vertical-align:1px;animation:blink 1.2s steps(2) infinite}
+.lv .hseg{background:rgba(255,255,255,.94);box-shadow:0 4px 14px rgba(17,25,90,.12);border-radius:10px}
+.lv .hseg button{color:var(--muted)}
+.lv .hseg button[aria-pressed="true"]{background:var(--pri);color:#fff}
+.lv-btns{margin-left:auto;display:flex;gap:6px}
+.lv-btns button{height:34px;padding:0 14px;border:none;border-radius:999px;background:rgba(255,255,255,.94);color:var(--ink);font-size:12px;font-weight:500;box-shadow:0 4px 14px rgba(17,25,90,.12)}
+.lv .rd-mz{right:12px;top:auto;bottom:90px}
+.lv-guide{z-index:5;bottom:78px}
+.lv .rd-sos,.lv .rd-banner{z-index:5;color:#fff}
+#kmRv{position:absolute;inset:0}
+.lv-rvt{position:absolute;left:12px;top:12px;z-index:5;display:flex;flex-direction:column;padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.94);box-shadow:0 4px 14px rgba(17,25,90,.12)}
+.lv-rvt span{font-size:11px;color:var(--muted)}.lv-rvt b{font-size:14px}
+.lv-rvm{position:absolute;left:12px;bottom:10px;margin:0;z-index:5}
+html.app .mscan .lv{flex:1;display:flex;flex-direction:column;gap:0;min-height:0}
+html.app .mscan .lv-map{flex:1.35;border-radius:0;min-height:0}
+html.app .mscan .lv-rv{flex:1;border-radius:0;min-height:0;border-top:2px solid #fff}
+html.app .mscan .lv-top{left:10px;right:10px;top:10px}
+html.app .mscan .lv-chip{flex-basis:100%}
+html.app .mscan .lv-btns{margin-left:0}
+html.app .mscan .lv-guide{bottom:66px;width:calc(100% - 20px)}
+html.app .mscan .lv .rd-sos{bottom:12px;height:42px}
+html.app .mscan .lv .rd-mz{bottom:120px}
+html.app .mscan .lv-rvt{left:10px;top:10px}
+
+html.app .mscan .lv-map{flex:1.7}
+html.app .mscan .lv-guide{padding:8px 12px 8px 8px;gap:10px}
+html.app .mscan .lv-guide .ar{width:40px;height:40px}
+html.app .mscan .lv-guide b{font-size:14px;white-space:normal}
+html.app .mscan .lv-guide span{white-space:normal;font-size:11px}
+html.app .mscan .lv-chip{flex-basis:auto;padding:6px 10px}
+html.app .mscan .lv-chip span{display:none}
 </style>
 </head>
 <body>
@@ -2441,7 +2483,7 @@ function viewAR(){
       ${ui.cam ? `<div class="hud-bl"><div class="m">${mascot('idle', S.tint, 'glasses')}</div><div class="bub">바코드를 네모 안에 비춰 주세요.</div></div><button class="btn sm pe camx" data-act="cam">카메라 끄기</button>` : ''}${card}</div></div>
       <div class="ar-aside"><section class="panel"><div class="ptitle"><h2><span class="no">DEMO</span>바코드 인식 체험</h2></div><div class="pbody"><p class="note" style="margin-bottom:10px">카메라 없이도 인식된 것처럼 띄워 볼 수 있어요.</p><div class="prods" style="grid-template-columns:1fr 1fr">${PRODUCTS.map(p => `<button data-arhit="${p.id}">${esc(p.name)}<small>${p.code}</small></button>`).join('')}</div></div></section>${myBox}</div></div>`;
   }
-  return head + `<div class="arwrap">${RD.mode === 'live' || ui.cam ? rdStage() : r3Stage()}<div class="ar-aside">${rdAside()}</div></div>`;
+  return head + `<div class="arwrap${RD.mode === 'live' && !ui.cam ? ' lvwrap' : ''}">${ui.cam ? rdStage() : RD.mode === 'live' ? lvMain() : r3Stage()}<div class="ar-aside">${rdAside()}</div></div>`;
 }
 /* ================= 소리 ================= */
 // 파일 없이 Web Audio로 만든 짧은 효과음. 상단 스피커 버튼으로 끌 수 있다.
@@ -2485,7 +2527,7 @@ const sndIcon = on => `<svg width="18" height="18" viewBox="0 0 24 24" fill="non
 // 실제 위치 모드: GPS(Geolocation) + 나침반(DeviceOrientation) + OpenStreetMap(Overpass) 병원·약국 + OSRM 도보 경로 + Nominatim 주소.
 // 예시 모드: 위치 권한이 없거나 이 화면에서 위치를 못 쓸 때, 가상의 동네로 같은 흐름을 시연한다.
 const ERW = {ko:['응급실','약국','병원'], ja:['救急外来','薬局','病院'], zh:['急诊','药店','医院'], zt:['急診','藥局','醫院'], en:['Emergency','Pharmacy','Hospital'], fr:['Urgences','Pharmacie','Hôpital'], es:['Urgencias','Farmacia','Hospital'], vi:['Cấp cứu','Nhà thuốc','Bệnh viện'], th:['ห้องฉุกเฉิน','ร้านขายยา','โรงพยาบาล']};
-const TKO = {er:'응급실', hp:'병원 · 응급실 확인 필요', rx:'약국'};
+const TKO = {er:'응급실', hp:'병원', rx:'약국'};
 const tIdx = t => t === 'er' ? 0 : t === 'rx' ? 1 : 2;
 const RAD = d => d * Math.PI / 180, DEG = r => r * 180 / Math.PI;
 function gDist(a, b){ const p = RAD(b.lat - a.lat), l = RAD(b.lon - a.lon), h = Math.sin(p / 2) ** 2 + Math.cos(RAD(a.lat)) * Math.cos(RAD(b.lat)) * Math.sin(l / 2) ** 2; return 2 * 6371000 * Math.asin(Math.min(1, Math.sqrt(h))); }
@@ -2545,7 +2587,7 @@ async function fetchJ(url, opt = {}, ms = 12000){ const c = new AbortController(
 const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter'];
 async function rdLoadPlaces(){
   const p = RD.pos; RD.fetchAt = p; RD.st = 'loading'; rdSlow(true);
-  if (KM.st === 'ready'){ try { const L = await kmSearch(p); if (L.length){ RD.places = L; RD.src = 'kakao'; RD.st = 'ok'; snd('scan'); rdSlow(true); rdTarget(); if (!RD.route) rdRouteTo(); return; } } catch (e) {} }
+  if (KM.st === 'ready'){ try { const L = await kmSearch(p); if (L.length){ RD.places = L; RD.src = 'kakao'; RD.st = 'ok'; snd('scan'); rdTarget(); if (!RD.route) rdRouteTo(); render(); return; } } catch (e) {} }
   const q = `[out:json][timeout:20];(nwr(around:5000,${p.lat},${p.lon})["amenity"="hospital"];nwr(around:5000,${p.lat},${p.lon})["emergency"="yes"]["amenity"~"hospital|clinic|doctors"];nwr(around:1500,${p.lat},${p.lon})["amenity"="pharmacy"];);out center tags 120;`;
   for (const u of OVERPASS){
     try { const j = await fetchJ(u, {method: 'POST', body: 'data=' + encodeURIComponent(q), headers: {'Content-Type': 'application/x-www-form-urlencoded'}}, 15000);
@@ -2681,14 +2723,14 @@ function rdStage(m){
     </div></div>`;
 }
 function rdListHTML(){
-  const f = ui.rdF || 'all', T = rdTarget(), l = rdL(), L = rdPlaces().filter(p => f === 'all' || (f === 'er' ? p.t !== 'rx' : p.t === 'rx')).slice(0, 8);
+  const f = ui.rdF || 'all', T = rdTarget(), l = rdL(), L = rdPlaces().filter(p => f === 'all' || (f === 'er' ? p.t !== 'rx' : p.t === 'rx')).sort((a, b) => ({er: 0, hp: 1, rx: 2}[a.t] - {er: 0, hp: 1, rx: 2}[b.t]) || a.d - b.d).slice(0, 10);
   if (!L.length) return `<p class="note">${RD.st === 'loading' ? '주변을 찾는 중이에요…' : '가까운 곳을 찾지 못했어요.'}</p>`;
   return L.map(p => `<div class="rd-row${T && p.id === T.id ? ' on' : ''}${p.oh.open === false ? ' off' : ''}"><button class="rd-rowb" data-rdsel="${esc(p.id)}"><span class="pin ${p.t}">${rdIcon(p.t, 15)}</span><div><b>${esc(p.n)}</b><span>${TKO[p.t]}${l !== 'ko' ? ' · ' + ERW[l][tIdx(p.t)] : ''} · <em class="${p.oh.open === false ? 'cl' : ''}">${p.oh.text}</em></span></div><span class="mono">${rdDist(p.d)}</span></button>${p.url ? `<a class="rd-tel" href="${esc(p.url)}" target="_blank" rel="noopener">상세</a>` : ''}${p.phone ? `<a class="rd-tel" href="tel:${esc(p.phone.replace(/[^\d+]/g, ''))}" aria-label="${esc(p.n)} 전화">전화</a>` : ''}</div>`).join('');
 }
 const mX = (lon, z) => (lon + 180) / 360 * 256 * 2 ** z;
 const mY = (lat, z) => { const s = Math.sin(RAD(lat)); return (.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * 256 * 2 ** z; };
 function rdMapHTML(){
-  const box = $('rdMap'); const W = Math.max(260, box ? box.clientWidth : 320), H = 230, z = RD.z, P = rdPos(), cx = mX(P.lon, z), cy = mY(P.lat, z);
+  const box = $('rdMap'); const W = Math.max(260, box ? box.clientWidth : 320), H = Math.max(230, box ? box.clientHeight : 230), z = RD.z, P = rdPos(), cx = mX(P.lon, z), cy = mY(P.lat, z);
   const X = lon => mX(lon, z) - cx + W / 2, Y = lat => mY(lat, z) - cy + H / 2, live = RD.mode === 'live';
   const mpp = 156543.03 * Math.cos(RAD(P.lat)) / 2 ** z;
   let tiles = '';
@@ -2735,12 +2777,26 @@ function sosBody(){
     <div class="rd-info"><div><b>알레르기</b><span>${mine.map(esc).join(', ') || '등록 안 됨'}</span></div><div><b>반응 정도</b><span>${S.level ? LEVEL[S.level][0] : '-'}</span></div><div><b>복용 약</b><span>${esc(S.memo) || '-'}</span></div><div><b>보호자</b><span>${esc(S.contact) || '-'}</span></div></div>
     <button class="btn wide2" data-act="sosx">응급 모드 끝내기</button>`;
 }
+function lvMain(m){
+  const f = ui.rdF || 'all', T = rdTarget();
+  return `<div class="lv${ui.sos ? ' sos' : ''}" id="lvStage">
+    <div class="lv-map"><div class="rd-map" id="rdMap"></div>
+      <div class="lv-top"><div class="lv-chip"><b><i class="rec"></i>TRACE</b><span id="rdStat">${rdStatus()}</span></div>
+        <div class="hseg pe">${[['all','전체'],['er','응급실'],['rx','약국']].map(([k, n]) => `<button aria-pressed="${f === k}" data-rdf="${k}">${n}</button>`).join('')}</div>
+        <div class="lv-btns">${m === 'm' ? '<button data-act="rdmap">목록</button>' : ''}<button data-act="cam">카메라 AR</button></div></div>
+      <div class="rd-guide lv-guide" id="rdGuide"></div>
+      ${ui.sos ? '<div class="rd-banner">응급 모드 · 가장 가까운 응급실로 안내 중</div>' : '<button class="rd-sos" data-act="sos"><i></i>응급 시작</button>'}
+    </div>
+    <div class="lv-rv"><div id="kmRv"></div><div class="lv-rvt"><span>도착지 로드뷰 · 입구 미리 보기</span><b id="lvRvT">${T ? esc(T.n) : ''}</b></div>
+      <p class="note lv-rvm" id="kmRvMsg">${KM.st === 'ready' ? '' : '카카오 지도를 연결하면 도착지 거리 사진이 보여요.'}</p></div>
+  </div>`;
+}
 function rdAside(){
   const T = rdTarget();
   return `${ui.sos ? `<section class="panel emg rd-sosp"><div class="ptitle"><h2>응급 모드</h2><span class="mono" style="font-size:11px">SOS</span></div><div class="pbody">${sosBody()}</div></section>`
       : `<section class="panel"><div class="pbody rd-start"><b style="font-size:16px">숨쉬기 힘들거나 목이 부으면</b><p class="note" style="margin:0">버튼 하나로 응급번호, 지금 위치, 현지어 문장, 가장 가까운 응급실 길 안내가 한 번에 열려요.</p><button class="btn" data-act="sos">응급 시작</button></div></section>`}
-    <section class="panel"><div class="ptitle"><h2><span class="no">MAP</span>주변 지도</h2><span class="note">${RD.mode === 'live' ? '실제 위치' : '예시 위치'}</span></div><div class="rd-map" id="rdMap">${rdMapHTML()}</div></section>
-    ${KM.st === 'ready' ? `<section class="panel"><div class="ptitle"><h2><span class="no">VIEW</span>도착지 로드뷰</h2><span class="note">입구 미리 보기</span></div><div class="km-rvbox"><div id="kmRv"></div><p class="note" id="kmRvMsg"></p></div></section>` : ''}
+    ${RD.mode === 'live' && !ui.cam ? '' : `<section class="panel"><div class="ptitle"><h2><span class="no">MAP</span>주변 지도</h2><span class="note">${RD.mode === 'live' ? '실제 위치' : '예시 위치'}</span></div><div class="rd-map" id="rdMap">${rdMapHTML()}</div></section>`}
+    ${KM.st === 'ready' && !(RD.mode === 'live' && !ui.cam) ? `<section class="panel"><div class="ptitle"><h2><span class="no">VIEW</span>도착지 로드뷰</h2><span class="note">입구 미리 보기</span></div><div class="km-rvbox"><div id="kmRv"></div><p class="note" id="kmRvMsg"></p></div></section>` : ''}
     <section class="panel"><div class="ptitle"><h2><span class="no">NEAR</span>가까운 곳</h2><span class="note">${RD.mode === 'live' ? (RD.src === 'kakao' ? '카카오맵' : 'OpenStreetMap') : '예시 데이터'}</span></div><div class="pbody" id="rdList">${rdListHTML()}</div>${!ui.sos && T ? `<div class="pbody" style="padding-top:0">${rdNavLinks(T)}</div>` : ''}</section>
     <p class="note">${RD.mode === 'live' ? (RD.src === 'kakao' ? '병원·약국 위치와 주소는 카카오맵, 도보 경로는 OSRM 정보예요.' : '병원·약국 위치는 OpenStreetMap, 도보 경로는 OSRM, 주소는 Nominatim 정보예요.') + ' 응급실 운영 여부는 전화로 꼭 확인해요.' : '지금은 예시 동네로 보여줘요. \'실제 위치로\'를 누르면 GPS로 실제 주변 병원·약국과 도보 경로를 찾아요. 위치와 카카오 지도는 GitHub Pages 같은 https 주소에서 열었을 때 작동해요.'} 정식 서비스에서는 응급의료포털(E-Gen) 실시간 병상 정보를 붙여 지금 받아줄 수 있는 응급실을 먼저 고르게 할 수 있어요.${trip() ? ` 간판 현지어: ${ERW[rdL()].slice(0, 2).join(' · ')}` : ''}</p>${kmPanel()}`;
 }
@@ -2750,7 +2806,7 @@ function rdSlow(force){
   const st = $('rdStat'); if (st) st.textContent = rdStatus();
   const l = $('rdList'); if (l) l.innerHTML = rdListHTML();
   const m = $('rdMap'); if (m && !kmMapMount()) m.innerHTML = rdMapHTML();
-  kmRvMount();
+  kmRvMount(); { const t = $('lvRvT'), T = rdTarget(); if (t) t.textContent = T ? T.n : ''; }
   const w = $('rdWhere'); if (w) w.innerHTML = rdWhereHTML();
   const ms = $('rdMarks'); if (ms){ const f = ui.rdF || 'all', l2 = rdL(), T = rdTarget();
     const P = rdPlaces().filter(p => f === 'all' || (f === 'er' ? p.t !== 'rx' : p.t === 'rx'));
@@ -2762,7 +2818,7 @@ function rdSlow(force){
 }
 // 빠른 갱신(방향이 바뀔 때): 화면 위 위치 계산
 function rdPaint(){
-  const st = $('rdStage'); if (!st) return;
+  const st = $('rdStage') || $('lvStage'); if (!st) return; const LV = st.id === 'lvStage';
   const W = st.clientWidth, H = st.clientHeight, FOV = W < 560 ? 28 : 36, f = W / 2 / Math.tan(RAD(FOV)), hz = H * .59, P = rdPos();
   let L = 0, R = 0;
   st.querySelectorAll('.rd-mk').forEach(el => {
@@ -2789,9 +2845,9 @@ function rdPaint(){
     sv.setAttribute('viewBox', `0 0 ${W} ${H}`); sv.innerHTML = out; }
   // 안내 카드
   const G = rdGuide(), gd = $('rdGuide');
-  if (gd && G){ const r = rdRel(gBear(P, G.next)), facing = Math.abs(r) < 10;
+  if (gd && G){ const abs = LV && !RD.compass, bb = gBear(P, G.next), r = abs ? ((bb + 540) % 360) - 180 : rdRel(bb), facing = !abs && Math.abs(r) < 10;
     if (facing && !RD.lock){ RD.lock = true; snd('lock'); } else if (Math.abs(r) > 22) RD.lock = false;
-    const head = RD.arrived ? '도착했어요' : G.text ? (G.last ? `${rdDist(G.toNext)} 앞 도착` : `${rdDist(G.toNext)} 후 ${G.text}`) : (facing ? '정면이에요 · 직진하세요' : `${r < 0 ? '왼쪽' : '오른쪽'}으로 ${Math.round(Math.abs(r))}° 돌아요`);
+    const head = RD.arrived ? '도착했어요' : G.text ? (G.last ? `${rdDist(G.toNext)} 앞 도착` : `${rdDist(G.toNext)} 후 ${G.text}`) : (abs ? `${DIR8[Math.round(bb / 45) % 8]}쪽으로 가세요` : facing ? '정면이에요 · 직진하세요' : `${r < 0 ? '왼쪽' : '오른쪽'}으로 ${Math.round(Math.abs(r))}° 돌아요`);
     gd.className = 'rd-guide' + (facing ? ' face' : '') + (RD.arrived ? ' done' : '');
     gd.innerHTML = `<span class="ar" style="transform:rotate(${RD.arrived ? 0 : r.toFixed(1)}deg)">${RD.arrived ? '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>' : '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V5M6 11l6-6 6 6"/></svg>'}</span>
       <div><b>${head}</b><span>${RD.arrived ? `${esc(G.T.n)} · 입구에서 비상 카드를 보여주세요` : `${G.name ? esc(G.name) + ' · ' : ''}${esc(G.T.n)} · 남은 ${rdDist(G.remain)} · ${rdMin(G.remain)}분`}${RD.routing ? ' · 경로 찾는 중' : RD.route && RD.route.src === 'line' && RD.mode === 'live' ? ' · 직선 방향' : ''}</span></div>`;
@@ -2803,7 +2859,7 @@ function rdPaint(){
   const cone = document.querySelector('#rdMap .cone'); if (cone) cone.setAttribute('transform', `rotate(${RD.hd.toFixed(0)})`);
 }
 function rdLoop(t){
-  RD.raf = 0; const st = $('rdStage'); if (!st){ RD.sim = null; return; }
+  RD.raf = 0; const st = $('rdStage') || $('lvStage'); if (!st){ RD.sim = null; return; }
   const dt = Math.min(.1, (t - (RD.t0 || t)) / 1000); RD.t0 = t;
   // 걷기 시뮬레이션: 경로를 따라 이동하고 걷는 방향을 본다
   if (RD.sim && RD.route){ const Rr = RD.route.pts, s = RD.sim; let mv = 16 * dt;
@@ -2817,8 +2873,8 @@ function rdLoop(t){
   RD.raf = requestAnimationFrame(rdLoop);
 }
 function rdMount(){
-  kmLoad(); const st = $('rdStage'); if (!st) return;
-  st.addEventListener('pointerdown', e => { if (e.target.closest('.pe')) return; RD.drag = {x: e.clientX, h: RD.hdT}; st.setPointerCapture(e.pointerId); st.classList.add('dragging'); });
+  kmLoad(); const st = $('rdStage') || $('lvStage'); if (!st) return;
+  if (st.id === 'rdStage') st.addEventListener('pointerdown', e => { if (e.target.closest('.pe')) return; RD.drag = {x: e.clientX, h: RD.hdT}; st.setPointerCapture(e.pointerId); st.classList.add('dragging'); });
   st.addEventListener('pointermove', e => { if (!RD.drag) return; RD.hdT = RD.hd = RD.drag.h - (e.clientX - RD.drag.x) * .22; rdPaint(); });
   const end = () => { RD.drag = null; st.classList.remove('dragging'); }; st.addEventListener('pointerup', end); st.addEventListener('pointercancel', end);
   if (!RD.bound){ RD.bound = true;
@@ -2849,16 +2905,22 @@ function kmLoad(){
   document.head.appendChild(sc);
 }
 function kmSearch(p){
+  // 진짜 응급실만: 병원 카테고리(HP8)인 곳 중 이름이나 분류에 응급이 들어간 곳 + 종합병원·대학병원(대부분 응급실 운영)
   const SV = kakao.maps.services, L = new kakao.maps.LatLng(p.lat, p.lon);
   const ask = (fn, a, r) => new Promise(res => KM.ps[fn](a, (d, st) => res(st === SV.Status.OK ? d : []), {location: L, radius: r, sort: SV.SortBy.DISTANCE}));
-  return Promise.all([ask('keywordSearch', '응급실', 10000), ask('categorySearch', 'HP8', 5000), ask('categorySearch', 'PM9', 1500)]).then(([er, hp, rx]) => {
-    const out = [], seen = new Set(), add = (d, t) => { if (seen.has(d.id)) return; seen.add(d.id);
+  const isHosp = d => d.category_group_code === 'HP8' || /^의료,건강 > 병원/.test(d.category_name || '');
+  const bad = d => /동물|한의|치과|요양|정신|재활|피부|성형|안과|이비인후|산부인과|소아청소년과의원|의원$/.test((d.category_name || '') + ' ' + d.place_name);
+  return Promise.all([ask('keywordSearch', '응급실', 15000), ask('keywordSearch', '응급의료센터', 15000), ask('keywordSearch', '종합병원', 10000), ask('keywordSearch', '대학교병원', 15000), ask('categorySearch', 'PM9', 1500)]).then(([e1, e2, g1, g2, rx]) => {
+    const out = [], seen = new Set(), add = (d, t, tag) => { if (seen.has(d.id)) return; seen.add(d.id);
       out.push({id: 'k' + d.id, t, n: d.place_name, nl: '', lat: +d.y, lon: +d.x, phone: d.phone || '', url: d.place_url, addr: d.road_address_name || d.address_name, src: 'kakao',
-        oh: t === 'er' ? {open: null, text: '운영 여부 전화 확인'} : t === 'rx' ? {open: null, text: '영업시간 확인'} : {open: null, text: '진료시간 확인'}}); };
-    er.filter(d => /병원|의료원|응급|의료센터/.test(d.place_name + d.category_name) && !/동물|한의|치과/.test(d.place_name + d.category_name)).forEach(d => add(d, 'er'));
-    hp.filter(d => /종합병원|대학병원/.test(d.category_name) && !/동물|한의|치과/.test(d.category_name + d.place_name)).forEach(d => add(d, 'hp'));
+        oh: t === 'rx' ? {open: null, text: '영업시간 확인'} : t === 'er' ? {open: true, text: tag, h24: true} : {open: null, text: tag}}); };
+    e1.concat(e2).filter(d => isHosp(d) && !bad(d) && /응급|병원|의료원|의료센터/.test(d.place_name + d.category_name)).forEach(d => add(d, 'er', /권역/.test(d.place_name) ? '권역응급의료센터 · 24시간' : /지역응급/.test(d.place_name) ? '지역응급의료센터 · 24시간' : '24시간 운영'));
+    g1.concat(g2).filter(d => isHosp(d) && !bad(d) && /종합병원|대학병원/.test(d.category_name + d.place_name)).forEach(d => add(d, 'hp', '응급실은 전화 확인'));
     rx.filter(d => !/동물/.test(d.place_name + d.category_name)).forEach(d => add(d, 'rx'));
-    return out;
+    // 같은 병원이 '병원'과 '응급실'로 두 번 잡히면 하나만
+    const ers = out.filter(x => x.t === 'er'), keep = out.filter(x => x.t !== 'er');
+    ers.forEach(x => { if (!keep.some(y => y.t === 'er' && gDist(x, y) < 120)) keep.push(x); });
+    return keep.filter(x => x.t !== 'hp' || !keep.some(y => y.t === 'er' && gDist(x, y) < 150));
   });
 }
 function kmAddr(p){ return new Promise(res => KM.gc.coord2Address(p.lon, p.lat, (r, st) => { if (st !== kakao.maps.services.Status.OK || !r[0]) return res(''); const a = r[0].road_address, b = r[0].address; res(a ? a.address_name + (a.building_name ? ` (${a.building_name})` : '') : b ? b.address_name : ''); })); }
@@ -3144,10 +3206,10 @@ function scanM(){
   const m = ['code','label','radar','meal'].includes(ui.arMode) ? ui.arMode : 'code'; ui.arMode = m;
   let stage = '', sheet = '';
   if (m === 'radar'){
-    stage = RD.mode === 'live' || ui.cam ? rdStage('m') : r3Stage('m');
+    stage = ui.cam ? rdStage('m') : RD.mode === 'live' ? lvMain('m') : r3Stage('m');
     if (ui.sos && ui.sosOpen) sheet = `<section class="msheet sosM" role="dialog" aria-label="응급 모드"><span class="grab"></span><button class="mx" data-act="sosopen" aria-label="접기">×</button>${sosBody()}</section>`;
     else if (ui.sos){ const t = trip(), em = t ? t.em : '119', T = rdTarget(); sheet = `<section class="msheet sosM sosC" role="dialog" aria-label="응급 모드"><span class="grab"></span><div class="sos-c"><a class="rd-call" href="tel:${em}"><span>${t ? esc(t.n) + ' ' : ''}응급 번호</span><b>${em}</b></a><div class="sos-ci"><b>${T ? esc(T.n) : ''}</b><span>${T ? rdDist(T.d) + ' · 걸어서 ' + rdMin(T.d) + '분' : ''}</span><button class="btn sm pri" data-act="sosopen">내 위치 · 현지어 문장 · 응급 순서</button></div></div></section>`; }
-    else if (ui.rdSheet) sheet = `<section class="msheet sosM" role="dialog" aria-label="주변 지도"><span class="grab"></span><button class="mx" data-act="rdmap" aria-label="닫기">×</button><h3 class="ms-h">주변 지도</h3><div class="rd-map" id="rdMap"></div>${KM.st === 'ready' ? '<h3 class="ms-h" style="margin-top:14px">도착지 로드뷰</h3><div class="km-rvbox"><div id="kmRv"></div><p class="note" id="kmRvMsg"></p></div>' : ''}<div id="rdList" style="margin-top:10px"></div>${rdNavLinks(rdTarget())}${kmPanel()}</section>`;
+    else if (ui.rdSheet) sheet = `<section class="msheet sosM" role="dialog" aria-label="주변 지도"><span class="grab"></span><button class="mx" data-act="rdmap" aria-label="닫기">×</button><h3 class="ms-h">${RD.mode === 'live' ? '가까운 응급실 · 약국' : '주변 지도'}</h3>${RD.mode === 'live' ? '' : '<div class="rd-map" id="rdMap"></div>'}${KM.st === 'ready' && RD.mode !== 'live' ? '<h3 class="ms-h" style="margin-top:14px">도착지 로드뷰</h3><div class="km-rvbox"><div id="kmRv"></div><p class="note" id="kmRvMsg"></p></div>' : ''}<div id="rdList" style="margin-top:10px"></div>${rdNavLinks(rdTarget())}${kmPanel()}</section>`;
   } else if (m === 'meal'){
     stage = `<div class="mmeal">${mealView()}<div class="mmeal-in"><button class="btn" data-act="mealpaste">식단표 붙여넣기</button><button class="btn" data-act="mealsample">예시 식단표</button></div></div>`;
     if (ui.mpaste) sheet = `<div class="msheet-bg" data-act="sheetx"></div><section class="msheet"><span class="grab"></span><h3 class="ms-h">급식 식단표 붙여넣기</h3><label class="sr" for="mt">식단표</label><textarea class="label" id="mt">${esc(ui.meal)}</textarea><div class="ms-act"><button class="btn pri" data-act="mealrun">확인하기</button><button class="btn" data-act="sheetx">닫기</button></div></section>`;
