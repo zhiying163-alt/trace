@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TRACE 트레이스</title>
 <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -1265,6 +1266,110 @@ html.app .mscan .lv-chip span{display:none}
 .lv-empty .m{width:84px;height:84px}
 .lv-empty b{font-size:18px}.lv-empty p{margin:0;max-width:320px;font-size:13px;color:var(--muted);line-height:1.6}
 .lv-rv:has(#kmRv:empty) .lv-rvt{display:none}
+/* 함께 먹는 식탁 */
+.tblwrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+.tbl-room{position:relative;height:clamp(460px,64vh,620px);border-radius:22px;overflow:hidden;background:#EEF1FD;box-shadow:0 1px 0 var(--line)}
+.tbl-wall{position:absolute;left:0;right:0;top:0;height:58%;background:linear-gradient(180deg,#E3E7FD,#F3F5FE)}
+.tbl-wall .win{position:absolute;left:8%;top:12%;width:22%;height:46%;border-radius:14px;background:linear-gradient(160deg,#FFFFFF,#D7DDFB);box-shadow:inset 0 0 0 6px #fff,0 8px 24px rgba(63,81,230,.08)}
+.tbl-wall .win::after{content:'';position:absolute;left:50%;top:6px;bottom:6px;width:4px;margin-left:-2px;background:#fff}
+.tbl-wall .lamp{position:absolute;left:50%;top:0;width:2px;height:14%;background:#B9C1EE}
+.tbl-wall .lamp::after{content:'';position:absolute;left:-34px;top:100%;width:70px;height:26px;border-radius:40px 40px 6px 6px;background:var(--pri);box-shadow:0 30px 70px 30px rgba(255,236,180,.35)}
+.tbl-floor{position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(180deg,#D9DEF8,#CBD2F4)}
+.tbl-table{position:absolute;left:6%;right:6%;bottom:6%;height:46%;perspective:900px;z-index:3}
+.tbl-top{position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse at 50% 40%,#FFFFFF 0,#F6F7FE 60%,#E7EAFB 100%);transform:rotateX(58deg);transform-origin:50% 100%;box-shadow:0 26px 0 -6px #B7C0EC,0 40px 50px rgba(29,42,134,.18)}
+.tbl-hint{position:absolute;left:0;right:0;top:44%;text-align:center;margin:0;color:var(--muted);font-size:15px;transform:rotateX(-58deg)}
+.tbl-plate{position:absolute;width:150px;height:150px;margin:-75px 0 0 -75px;border:none;background:none;padding:0;cursor:pointer;transform-style:preserve-3d}
+.tbl-plate i{position:absolute;inset:0;border-radius:50%;background:#fff;box-shadow:0 6px 0 #DDE1F6,0 14px 24px rgba(29,42,134,.16)}
+.tbl-plate i::after{content:'';position:absolute;inset:26px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.55),transparent 45%),var(--c)}
+.tbl-plate span,.tbl-plate em{position:absolute;left:50%;transform:translateX(-50%) rotateX(-58deg);white-space:nowrap;font-style:normal}
+.tbl-plate span{top:-34px;padding:4px 10px;border-radius:999px;background:var(--ink);color:#fff;font-size:15px;font-weight:600}
+.tbl-plate em{bottom:-38px;padding:3px 9px;border-radius:999px;background:#FDECEC;color:#C2383C;font-size:13px;font-weight:600}
+.tbl-plate.new{animation:plateIn .5s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes plateIn{from{transform:translateY(-120px) scale(.6);opacity:0}}
+.tbl-seat{position:absolute;width:120px;margin-left:-60px;transform:translateY(-10%);display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:none;padding:0;cursor:pointer;z-index:2;animation:seatIn .6s var(--d) both}
+@keyframes seatIn{from{transform:translateY(30px);opacity:0}}
+.tbl-seat .m{width:104px;height:104px;animation:bob 3s ease-in-out infinite;animation-delay:var(--d)}
+@keyframes bob{50%{transform:translateY(-6px)}}
+.tbl-seat.hit .m{animation:shake .5s 2}
+@keyframes shake{25%{transform:translateX(-6px) rotate(-4deg)}75%{transform:translateX(6px) rotate(4deg)}}
+.tbl-seat.safe .m,.tbl-seat.wave .m{animation:hop .9s ease-in-out infinite;animation-delay:var(--d)}
+@keyframes hop{50%{transform:translateY(-12px)}}
+.tbl-seat .nm{font-size:13px;font-weight:600;color:var(--ink);background:#fff;padding:2px 10px;border-radius:999px;box-shadow:0 2px 8px rgba(17,25,90,.08)}
+.tbl-seat .al{font-size:11px;color:var(--muted)}
+.tbl-seat .bub{position:relative;max-width:170px;padding:6px 11px;border-radius:14px;background:#fff;font-size:12px;line-height:1.35;color:var(--ink);box-shadow:0 4px 14px rgba(17,25,90,.1);white-space:normal;text-align:center}
+.tbl-seat .bub::after{content:'';position:absolute;left:50%;bottom:-5px;width:10px;height:10px;margin-left:-5px;background:#fff;transform:rotate(45deg)}
+.tbl-seat.risk .bub{background:#FDECEC;color:#B2343A}.tbl-seat.risk .bub::after{background:#FDECEC}
+.tbl-seat.warn .bub{background:#FFF4E0;color:#9A6512}.tbl-seat.warn .bub::after{background:#FFF4E0}
+.tbl-seat.safe .bub{background:var(--pri);color:#fff}.tbl-seat.safe .bub::after{background:var(--pri)}
+.tbl-add{position:absolute;top:22%;width:64px;height:64px;margin-left:-32px;border:2px dashed #B7C0EC;border-radius:50%;background:rgba(255,255,255,.6);color:var(--pri);font-size:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2}
+.tbl-add span{position:absolute;top:70px;font-size:11px;white-space:nowrap;color:var(--muted)}
+.tbl-win{position:absolute;left:50%;top:14px;transform:translateX(-50%);padding:9px 18px;border-radius:999px;background:var(--pri);color:#fff;font-weight:600;font-size:14px;z-index:4;box-shadow:0 10px 26px rgba(63,81,230,.35);animation:plateIn .5s both}
+.tbl-room.ok::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.0),rgba(63,81,230,.08));animation:rdp 1.4s ease-in-out 2}
+.tbl-side{display:flex;flex-direction:column;gap:16px}
+.tbl-res{display:flex;flex-direction:column;gap:10px}
+.tbl-res .okt{font-size:18px;color:var(--pri)}
+.tbl-cant{display:flex;gap:10px;align-items:center}
+.tbl-cant .m{width:44px;height:44px;flex:none}
+.tbl-cant b{display:block;font-size:14px}.tbl-cant span{font-size:12px;color:var(--muted)}
+.tbl-menu{margin-top:16px}
+.tbl-menu .chips{display:flex;flex-wrap:wrap;gap:6px}
+.tbl-menu .chip.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.tbl-menu .okd{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--safe);margin-right:6px;vertical-align:1px}
+@media (max-width:980px){.tblwrap{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){
+  .tbl-room{height:440px;border-radius:18px}
+  .tbl-seat{width:86px;margin-left:-43px}.tbl-seat .m{width:66px;height:66px}
+  .tbl-seat .bub{max-width:110px;font-size:10.5px;padding:5px 8px}.tbl-seat .al{display:none}
+  .tbl-plate{width:96px;height:96px;margin:-48px 0 0 -48px}.tbl-plate i::after{inset:16px}
+  .tbl-plate span{font-size:12px;top:-28px}.tbl-plate em{font-size:11px;bottom:-30px}
+  .tbl-table{left:2%;right:2%}
+}
+html.app .tbl-room{margin:0 -4px}
+
+.tbl-dishes{position:absolute;inset:0}
+.tbl-dishes .tbl-hint{transform:none;top:52%}
+.tbl-plate{width:150px;height:78px;margin:-39px 0 0 -75px}
+.tbl-plate i{border-radius:50%}
+.tbl-plate i::after{inset:12px 24px}
+.tbl-plate span,.tbl-plate em{transform:translateX(-50%)}
+.tbl-plate span{top:-30px}
+.tbl-plate em{bottom:-30px}
+@media (max-width:760px){.tbl-plate{width:92px;height:48px;margin:-24px 0 0 -46px}.tbl-plate i::after{inset:8px 15px}.tbl-plate span{top:-26px}.tbl-plate em{bottom:-26px}}
+
+.tblwrap{grid-template-areas:'room side' 'menu side'}
+.tbl-room{grid-area:room}.tbl-side{grid-area:side;min-width:0}.tbl-menu{grid-area:menu;margin-top:0;min-width:0}
+@media (max-width:980px){.tblwrap{grid-template-areas:'room' 'menu' 'side'}}
+@media (max-width:760px){
+  .tbl-menu .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+  .tbl-menu .chips::-webkit-scrollbar{display:none}
+  .tbl-menu .chip{flex:none}
+  .tbl-add{display:none}
+  .tbl-win{top:auto;bottom:12px;font-size:13px;white-space:nowrap}
+  .tbl-menu .ptitle .note{display:none}
+}
+
+/* 함께 식탁 3D */
+.tbl-room.t3{background:#EEF1FB}
+#tbl3c,#tbl3c .t3c{position:absolute;inset:0;width:100%!important;height:100%!important;display:block}
+#tbl3c .t3c{cursor:grab}
+#tblTags{position:absolute;inset:0;pointer-events:none;z-index:2}
+.t3-bub{position:absolute;transform:translate(-50%,-100%);max-width:180px;padding:7px 12px;border-radius:14px;background:#fff;color:var(--ink);font-size:12.5px;line-height:1.35;text-align:center;box-shadow:0 6px 18px rgba(17,25,90,.14);white-space:normal;width:max-content}
+.t3-bub::after{content:'';position:absolute;left:50%;bottom:-5px;width:10px;height:10px;margin-left:-5px;background:inherit;transform:rotate(45deg)}
+.t3-bub.risk{background:#FDECEC;color:#B2343A}.t3-bub.warn{background:#FFF4E0;color:#9A6512}.t3-bub.safe{background:var(--pri);color:#fff}
+.t3-nm{position:absolute;transform:translate(-50%,0);display:flex;flex-direction:column;align-items:center;gap:1px}
+.t3-nm b{font-size:12.5px;padding:2px 10px;border-radius:999px;background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(17,25,90,.12);white-space:nowrap}
+.t3-nm small{font-size:10.5px;color:#5A6190;background:rgba(255,255,255,.75);padding:0 6px;border-radius:6px;white-space:nowrap}
+.t3-dish{position:absolute;transform:translate(-50%,-100%);padding:4px 11px;border-radius:999px;background:var(--ink);color:#fff;font-size:13px;font-weight:600;white-space:nowrap;box-shadow:0 4px 12px rgba(17,25,90,.2)}
+.t3-no{position:absolute;transform:translate(-50%,0);padding:2px 9px;border-radius:999px;background:#FDECEC;color:#C2383C;font-size:12px;font-weight:600;white-space:nowrap}
+.t3-add{position:absolute;right:14px;top:14px;z-index:3;height:34px;padding:0 14px;border:none;border-radius:999px;background:rgba(255,255,255,.94);color:var(--pri);font-size:12.5px;font-weight:600;box-shadow:0 4px 14px rgba(17,25,90,.12)}
+.t3-hint{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);margin:0;z-index:3;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.92);color:var(--muted);font-size:13px;white-space:nowrap;box-shadow:0 4px 14px rgba(17,25,90,.1)}
+.t3-drag{position:absolute;left:14px;bottom:12px;margin:0;z-index:3;font-size:11px;color:#7A80A0}
+.tbl-room.t3 .tbl-win{top:auto;bottom:40px}
+@media (max-width:760px){.tbl-room.t3{height:400px}.t3-bub{max-width:110px;font-size:10.5px;padding:5px 8px}.t3-nm small{display:none}.t3-dish{font-size:11px;padding:3px 8px}.t3-no{font-size:10.5px}.t3-drag{display:none}.t3-hint{font-size:12px}}
+
+.t3-bub b{display:block;font-size:12px;margin-bottom:2px}
+.t3-bub b small{font-weight:400;opacity:.75;margin-left:5px;font-size:10.5px}
+.t3-bub.safe b small{opacity:.85}
 </style>
 </head>
 <body>
@@ -2375,6 +2480,252 @@ function placeColor(p){ if (p.cat === '마트') return 'pri'; const L = crit(); 
 function whoCant(ing){ return members().filter(m => judge(ing, m.allergies) === 'risk').map(m => m.name); }
 const VTX = {safe:'먹을 수 있어요', warn:'확인 필요', risk:'피하세요', none:'기준 없음'};
 
+/* ================= 함께 먹는 식탁 (가상 공간) ================= */
+// 같이 먹는 사람들의 레이가 한 식탁에 앉는다. 메뉴를 올리면 각자 표정으로 반응하고, 모두가 먹을 수 있는 한 상을 차리면 성공.
+const TBL = {dishes: [], last: '', cheer: 0};
+const TSHAPE = ['orb', 'bear', 'drop', 'bean', 'cloud', 'capsule'];
+const TACC = ['none', 'ribbon', 'beanie', 'glasses', 'none', 'ribbon'];
+const TCOL = {'밀':'#E9C98B','우유':'#F6F1E4','알류(계란)':'#F7D86B','땅콩':'#C98F55','새우':'#F29A7E','게':'#E77D5F','대두':'#D9B77A','돼지고기':'#E7A39A','소고기':'#B8675A','닭고기':'#E8B27C','고등어':'#8FA4C8','오징어':'#F2D9C6','조개류':'#D8C3A8','호두':'#A9794E','잣':'#E6D2A6','메밀':'#9C8B78','복숭아':'#F7B3A1','토마토':'#E5544B'};
+function tblMembers(){ const me = {name: S.name && S.name !== '나' ? S.name : '나', allergies: myList(), me: true, shape: S.shape, acc: S.acc}; return [me].concat(S.group.slice(0, 5).map((m, i) => Object.assign({shape: TSHAPE[(i + 1) % 6], acc: TACC[i + 1]}, m))); }
+function tblJudge(m){
+  // 이 사람이 식탁 위 음식을 먹을 수 있는지
+  const bad = [], may = [];
+  TBL.dishes.forEach(d => { const r = an(DISH[d]); const hit = m.allergies.filter(k => r.contains.has(k)); const mh = m.allergies.filter(k => r.may.has(k)); if (hit.length) bad.push({d, k: hit}); else if (mh.length) may.push({d, k: mh}); });
+  return {st: !TBL.dishes.length ? 'idle' : bad.length ? 'risk' : may.length ? 'warn' : m.allergies.length ? 'safe' : 'wave', bad, may};
+}
+function tblLine(m, J){
+  if (!TBL.dishes.length) return m.me ? '뭐 먹을까?' : '배고파!';
+  if (J.bad.length){ const b = J.bad[0]; return `${b.d}에 ${b.k[0]}${jo(b.k[0], '이', '가')} 있어서 못 먹어`; }
+  if (J.may.length) return `${J.may[0].d}는 한 번 물어보자`;
+  return m.allergies.length ? '다 먹을 수 있어!' : '나는 다 괜찮아';
+}
+function tblDishColor(d){ const r = an(DISH[d]), ks = [...r.contains.keys()].map(k => TCOL[k]).filter(Boolean); const base = ['#F2C46B','#E9A25E','#9CCB7A','#E57A5A','#F3D9A4'][[...d].reduce((a, c) => a + c.charCodeAt(0), 0) % 5]; const c = ks.concat([base]).slice(0, 3); return c.length === 1 ? c[0] : `conic-gradient(${c.map((x, i) => `${x} ${i * 100 / c.length}% ${(i + 1) * 100 / c.length}%`).join(',')})`; }
+function tblSuggest(){
+  const L = [...new Set(tblMembers().flatMap(m => m.allergies))];
+  return Object.keys(DISH).filter(d => judge(DISH[d], L) === 'safe');
+}
+function viewTable(){
+  const M = tblMembers(), J = M.map(tblJudge), ok = TBL.dishes.length && J.every(j => j.st === 'safe' || j.st === 'wave'), n = M.length;
+  const cant = M.map((m, i) => ({m, j: J[i]})).filter(x => x.j.st === 'risk');
+  // 자리: 식탁 뒤 반원에 고르게
+  const seats = M.map((m, i) => { const a = n === 1 ? 0 : -62 + 124 * i / (n - 1); return {m, j: J[i], x: 50 + Math.sin(a * Math.PI / 180) * 38, y: 30 - Math.cos(a * Math.PI / 180) * 10}; });
+  const plates = TBL.dishes.map((d, i) => { const k = TBL.dishes.length, a = (i - (k - 1) / 2) * (k > 3 ? 21 : 24); return {d, x: 50 + a, y: 58 + (k > 2 && i % 2 ? 10 : 0)}; });
+  const sugg = tblSuggest();
+  const room2d = () => `
+      <div class="tbl-wall"><i class="win"></i><i class="lamp"></i></div>
+      <div class="tbl-floor"></div>
+      ${seats.map((s, i) => `<button class="tbl-seat ${s.j.st}${TBL.last && s.j.bad.some(b => b.d === TBL.last) ? ' hit' : ''}" style="left:${s.x}%;top:${s.y}%;--d:${i * .12}s" data-tblwho="${i}">
+        <span class="bub">${esc(tblLine(s.m, s.j))}</span><span class="m">${mascot(s.j.st === 'idle' ? (i % 2 ? 'idle' : 'wave') : s.j.st, 'blue', s.m.acc, s.m.shape)}</span>
+        <span class="nm">${esc(s.m.name)}${s.m.me ? ' (나)' : ''}</span><span class="al">${s.m.allergies.length ? s.m.allergies.slice(0, 3).map(esc).join(' · ') : '알레르기 없음'}</span></button>`).join('')}
+      ${n < 6 ? `<button class="tbl-add" data-act="gadd" style="left:${n === 1 ? 74 : 92}%">＋<span>자리 추가</span></button>` : ''}
+      <div class="tbl-table"><div class="tbl-top"></div><div class="tbl-dishes">
+        ${plates.map(p => `<button class="tbl-plate${p.d === TBL.last ? ' new' : ''}" style="left:${p.x}%;top:${p.y}%;--c:${tblDishColor(p.d)}" data-tbldel="${esc(p.d)}" aria-label="${esc(p.d)} 내리기"><i></i><span>${esc(p.d)}</span>${(() => { const w = M.filter(m => judge(DISH[p.d], m.allergies) === 'risk'); return w.length ? `<em>${w.map(m => esc(m.name)).join('·')} ✕</em>` : ''; })()}</button>`).join('')}
+        ${!TBL.dishes.length ? '<p class="tbl-hint">아래에서 메뉴를 골라 식탁에 올려 보세요</p>' : ''}
+      </div></div>
+`;
+  return `<div class="ph"><div><span class="k">03 · Space</span><h1>함께 먹는 식탁</h1><p>같이 먹는 사람들의 레이가 한 식탁에 앉아요. 메뉴를 올리면 각자 표정으로 반응해요. 모두가 웃는 한 상을 차려 보세요.</p></div>
+    <div class="seg"><button data-act="tblsug">모두 먹을 수 있는 메뉴 추천</button><button data-act="tblclr">식탁 비우기</button></div></div>
+  <div class="tblwrap">
+    <div class="tbl-room${ok ? ' ok' : ''}${window.THREE ? ' t3' : ''}" id="tblRoom">${window.THREE ? `<div id="tbl3c"></div><div id="tblTags"></div>${n < 6 ? '<button class="t3-add" data-act="gadd">+ 자리 추가</button>' : ''}${!TBL.dishes.length ? '<p class="t3-hint">아래에서 메뉴를 골라 식탁에 올려 보세요</p>' : ''}<p class="t3-drag">드래그해서 둘러보기 · 접시를 누르면 내려요</p>` : room2d()}
+      ${ok ? `<div class="tbl-win">모두가 먹을 수 있는 한 상이에요</div>` : ''}
+    </div>
+  <section class="panel tbl-menu"><div class="ptitle"><h2><span class="no">MENU</span>식탁에 올릴 메뉴</h2><span class="note">초록 점은 모두 먹을 수 있는 메뉴</span></div><div class="pbody">
+    <div class="chips">${Object.keys(DISH).map(d => `<button class="chip${TBL.dishes.includes(d) ? ' on' : ''}" aria-pressed="${TBL.dishes.includes(d)}" data-tbladd="${esc(d)}">${sugg.includes(d) ? '<i class="okd"></i>' : ''}${esc(d)}</button>`).join('')}</div>
+  </div></section>
+    <aside class="tbl-side">
+      <section class="panel"><div class="ptitle"><h2><span class="no">TABLE</span>식탁 결과</h2><span class="note">${n}명 · 메뉴 ${TBL.dishes.length}개</span></div><div class="pbody tbl-res">
+        ${!TBL.dishes.length ? '<p class="note" style="margin:0">메뉴를 올리면 누가 무엇을 못 먹는지 바로 보여줘요.</p>' : ok ? `<b class="okt">${n}명 모두 괜찮아요</b><p class="note" style="margin:0">흔한 레시피 기준이에요. 주문할 때 소스와 튀김 기름은 한 번 더 물어보세요.</p>` :
+          cant.map(x => `<div class="tbl-cant"><span class="m">${mascot('risk', 'blue', x.m.acc, x.m.shape)}</span><div><b>${esc(x.m.name)}</b><span>${x.j.bad.map(b => `${esc(b.d)} (${b.k.map(esc).join(', ')})`).join(' · ')}</span></div></div>`).join('') +
+          (J.some(j => j.st === 'warn') ? '<p class="note" style="margin:0">주의 표정은 같은 시설·조리도구에서 섞일 수 있다는 뜻이에요.</p>' : '')}
+      </div></section>
+      <section class="panel"><div class="ptitle"><h2><span class="no">WHO</span>같이 먹는 사람</h2></div><div class="pbody fg">
+        ${S.group.map((m, i) => `<div class="mem"><span class="av">${esc(m.name.slice(0, 1))}</span><div><b>${esc(m.name)}</b><div class="chips">${m.allergies.length ? m.allergies.map(k => `<span class="tg">${esc(k)}</span>`).join('') : '<span class="note">없음</span>'}</div></div><button class="del x" data-gdel="${i}" aria-label="${esc(m.name)} 빼기">×</button></div>`).join('')}
+        ${ui.gNew ? `<form class="gnew" data-form="gnew"><input id="gname" maxlength="8" placeholder="이름" value="${esc(ui.gNew.name)}" data-gname><div class="agrid sm">${AL.map(a => `<button type="button" aria-pressed="${ui.gNew.allergies.includes(a.k)}" data-gal="${esc(a.k)}"><span>${esc(a.k)}</span></button>`).join('')}</div><div style="display:flex;gap:6px"><button class="btn pri sm" type="submit">자리에 앉히기</button><button class="btn sm" type="button" data-act="gcancel">취소</button></div></form>` : S.group.length < 5 ? '<button class="btn sm" data-act="gadd">+ 같이 먹는 사람 추가</button>' : ''}
+      </div></section>
+    </aside>
+  </div>
+`;
+}
+function tblAdd(d){
+  if (TBL.dishes.includes(d)){ TBL.dishes = TBL.dishes.filter(x => x !== d); TBL.last = ''; snd('close'); render(); return; }
+  if (TBL.dishes.length >= 4) TBL.dishes.shift();
+  TBL.dishes.push(d); TBL.last = d; render();
+  const M = tblMembers(), bad = M.filter(m => judge(DISH[d], m.allergies) === 'risk');
+  const ok = M.map(tblJudge).every(j => j.st === 'safe' || j.st === 'wave');
+  if (bad.length){ snd('risk'); buzz([60, 40, 60]); } else if (ok && TBL.dishes.length >= 2){ snd('arrive'); } else snd('safe');
+}
+/* ================= 함께 먹는 식탁 3D ================= */
+// 실제 식당처럼 조명·그림자가 있는 3D 식탁. 레이들은 식탁 뒤에 앉아 카메라 쪽을 보고, 접시는 식탁 위로 내려온다.
+const T3 = {ok: false, memKey: '', dishKey: '', chars: [], plates: [], t: 0, yaw: 0, yawT: 0, drag: null};
+const T3SOUP = /찌개|국수|라면|우동|짬뽕|마라탕|쌀국수|탕$|죽|소바|카레|리조또/, T3CUP = /라떼|아이스티|우유$/;
+function t3Tex(w, h, draw){ const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; return t; }
+function t3Face(g, st, acc){
+  // 레이 얼굴(눈·입). 2D 캐릭터와 같은 표정 규칙
+  const N = '#1D2A86'; g.clearRect(0, 0, 256, 256); g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = N; g.lineWidth = 9;
+  const eye = (x, dx = 0, dy = 0) => { g.fillStyle = '#fff'; g.beginPath(); g.ellipse(x, 118, 24, 33, 0, 0, 7); g.fill(); g.fillStyle = N; g.beginPath(); g.ellipse(x + dx, 125 + dy, 15, 21, 0, 0, 7); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(x + dx + 5, 115 + dy, 5, 0, 7); g.fill(); };
+  const arc = x => { g.beginPath(); g.moveTo(x - 20, 124); g.quadraticCurveTo(x, 96, x + 20, 124); g.stroke(); };
+  if (st === 'safe' || st === 'wave'){ arc(96); arc(160); g.fillStyle = N; g.beginPath(); g.moveTo(112, 158); g.lineTo(144, 158); g.quadraticCurveTo(142, 182, 128, 182); g.quadraticCurveTo(114, 182, 112, 158); g.fill(); }
+  else if (st === 'risk'){ [[88, 1], [168, -1]].forEach(([x, s]) => { g.beginPath(); g.moveTo(x - 14 * s, 104); g.lineTo(x + 12 * s, 120); g.lineTo(x - 14 * s, 136); g.stroke(); }); g.fillStyle = N; g.beginPath(); g.ellipse(128, 168, 10, 13, 0, 0, 7); g.fill(); }
+  else if (st === 'warn'){ eye(96, 0, 6); eye(160, 0, 6); g.beginPath(); g.moveTo(72, 80); g.lineTo(96, 88); g.moveTo(184, 80); g.lineTo(160, 88); g.stroke(); g.beginPath(); g.moveTo(112, 172); g.quadraticCurveTo(120, 164, 128, 172); g.quadraticCurveTo(136, 180, 144, 172); g.stroke(); }
+  else { eye(96); eye(160); g.beginPath(); g.moveTo(116, 168); g.quadraticCurveTo(128, 178, 140, 168); g.stroke(); }
+  if (acc === 'glasses'){ g.lineWidth = 7; g.strokeStyle = N; g.fillStyle = 'rgba(191,227,255,.3)'; [[64, 92], [136, 92]].forEach(([x, y]) => { g.beginPath(); g.roundRect ? g.roundRect(x, y, 58, 54, 18) : g.rect(x, y, 58, 54); g.fill(); g.stroke(); }); }
+}
+function t3Badge(st){ return t3Tex(64, 64, (g) => { const c = {safe: '#2FA866', risk: '#E5484D', warn: '#E39A22'}[st]; if (!c) return; g.fillStyle = '#fff'; g.beginPath(); g.arc(32, 32, 30, 0, 7); g.fill(); g.fillStyle = c; g.beginPath(); g.arc(32, 32, 24, 0, 7); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 6; g.lineCap = 'round'; g.lineJoin = 'round'; g.beginPath();
+  if (st === 'safe'){ g.moveTo(21, 33); g.lineTo(29, 41); g.lineTo(44, 24); } else if (st === 'risk'){ g.moveTo(23, 23); g.lineTo(41, 41); g.moveTo(41, 23); g.lineTo(23, 41); } else { g.moveTo(32, 20); g.lineTo(32, 36); g.moveTo(32, 44); g.lineTo(32, 45); } g.stroke(); }); }
+function t3Build(){
+  const sc = new THREE.Scene(); sc.background = new THREE.Color(0xEEF1FB); sc.fog = new THREE.Fog(0xEEF1FB, 9, 18);
+  const std = (c, r = .8, m = 0) => new THREE.MeshStandardMaterial({color: c, roughness: r, metalness: m});
+  // 빛: 하늘빛 + 창문 쪽 해 + 식탁 위 조명
+  sc.add(new THREE.HemisphereLight(0xF4F6FF, 0xB9A58C, .42));
+  const sun = new THREE.DirectionalLight(0xFFF6EA, 1.15); sun.position.set(-3.5, 5.5, 2.5); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.camera.left = -4; sun.shadow.camera.right = 4; sun.shadow.camera.top = 4; sun.shadow.camera.bottom = -4; sun.shadow.radius = 4; sun.shadow.bias = -.0008; sc.add(sun);
+  const lamp = new THREE.PointLight(0xFFE7C2, .9, 6, 2); lamp.position.set(0, 2.15, 0); lamp.castShadow = true; lamp.shadow.mapSize.set(1024, 1024); lamp.shadow.radius = 6; sc.add(lamp);
+  const rim = new THREE.DirectionalLight(0xC9D0FF, .45); rim.position.set(3, 3, -4); sc.add(rim);
+  // 바닥: 밝은 원목
+  const wood = t3Tex(512, 512, (g, w, h) => { for (let i = 0; i < 8; i++){ const y = i * 64; g.fillStyle = ['#E9DAC4', '#E3D2BA', '#EEE1CD', '#E6D6BF'][i % 4]; g.fillRect(0, y, w, 64); g.fillStyle = 'rgba(120,90,60,.10)'; g.fillRect(0, y + 62, w, 2); const o = (i * 157) % w; g.fillRect(o, y, 2, 64); for (let k = 0; k < 14; k++){ g.fillStyle = `rgba(150,115,80,${.03 + Math.random() * .04})`; g.fillRect(0, y + Math.random() * 64, w, 1); } } });
+  wood.wrapS = wood.wrapT = THREE.RepeatWrapping; wood.repeat.set(4, 4);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshStandardMaterial({map: wood, roughness: .7})); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; sc.add(floor);
+  // 벽: 뒤·왼쪽, 아래는 블루 판넬
+  const wallM = std(0xF5F6FC, .95), panelM = std(0xDCE1FA, .8);
+  const back = new THREE.Mesh(new THREE.PlaneGeometry(20, 6), wallM); back.position.set(0, 3, -3.4); back.receiveShadow = true; sc.add(back);
+  const bp = new THREE.Mesh(new THREE.BoxGeometry(20, 1.05, .06), panelM); bp.position.set(0, .52, -3.37); bp.receiveShadow = true; sc.add(bp);
+  const left = new THREE.Mesh(new THREE.PlaneGeometry(14, 6), wallM); left.rotation.y = Math.PI / 2; left.position.set(-4.6, 3, 0); left.receiveShadow = true; sc.add(left);
+  // 창문(밝게 빛나는 유리) + 창틀
+  const win = new THREE.Group(); const glass = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 1.5), new THREE.MeshBasicMaterial({color: 0xFFFFFF})); win.add(glass);
+  const frM = std(0xFFFFFF, .5); [[0, .78, 2.02, .08], [0, -.78, 2.02, .08], [-.99, 0, .08, 1.62], [.99, 0, .08, 1.62], [0, 0, .05, 1.5]].forEach(([x, y, w, h]) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, .08), frM); b.position.set(x, y, .03); win.add(b); });
+  win.position.set(-1.9, 2.15, -3.36); sc.add(win);
+  const win2 = win.clone(); win2.position.set(1.9, 2.15, -3.36); sc.add(win2);
+  // 바닥 러그
+  const rug = new THREE.Mesh(new THREE.CircleGeometry(2.3, 64), std(0xC9D0F6, 1)); rug.rotation.x = -Math.PI / 2; rug.position.y = .005; rug.receiveShadow = true; sc.add(rug);
+  // 식탁: 흰 식탁보 원탁
+  const tbl = new THREE.Group();
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(1.15, 1.15, .05, 72), std(0xF3F4FA, .9)); top.position.y = .76; top.castShadow = top.receiveShadow = true; tbl.add(top);
+  const skirt = new THREE.Mesh(new THREE.CylinderGeometry(1.16, 1.2, .28, 72, 1, true), new THREE.MeshStandardMaterial({color: 0xFAFAFD, roughness: .95, side: THREE.DoubleSide})); skirt.position.y = .62; skirt.castShadow = true; tbl.add(skirt);
+  const leg = new THREE.Mesh(new THREE.CylinderGeometry(.08, .1, .62, 24), std(0x8C93B8, .5, .3)); leg.position.y = .31; leg.castShadow = true; tbl.add(leg);
+  const foot = new THREE.Mesh(new THREE.CylinderGeometry(.42, .46, .04, 40), std(0x8C93B8, .5, .3)); foot.position.y = .02; foot.receiveShadow = true; tbl.add(foot);
+  // 가운데 작은 꽃병
+  const vase = new THREE.Mesh(new THREE.CylinderGeometry(.06, .05, .2, 24), new THREE.MeshPhysicalMaterial({color: 0x9FB0FF, roughness: .15, transmission: 0, clearcoat: 1})); vase.position.set(-.62, .89, .45); vase.castShadow = true; tbl.add(vase);
+  [[-.65, 1.06, .45], [-.58, 1.04, .47], [-.62, 1.1, .43]].forEach(([x, y, z], i) => { const f = new THREE.Mesh(new THREE.SphereGeometry(.04, 16, 12), std([0xFFFFFF, 0xDDE3FF, 0xFFFFFF][i], .6)); f.position.set(x, y, z); tbl.add(f); });
+  sc.add(tbl);
+  // 펜던트 조명
+  const shade = new THREE.Mesh(new THREE.SphereGeometry(.32, 40, 20, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({color: 0x3F51E6, roughness: .4, side: THREE.DoubleSide})); shade.position.set(0, 2.25, 0); sc.add(shade);
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(.09, 20, 12), new THREE.MeshBasicMaterial({color: 0xFFF3DC})); bulb.position.set(0, 2.2, 0); sc.add(bulb);
+  const cord = new THREE.Mesh(new THREE.CylinderGeometry(.008, .008, 2, 6), std(0x1D2A86)); cord.position.set(0, 3.55, 0); sc.add(cord);
+  T3.scene = sc; T3.mats = {std};
+  T3.body = new THREE.MeshPhysicalMaterial({color: 0x4357EA, roughness: .38, clearcoat: .6, clearcoatRoughness: .25});
+  T3.navy = new THREE.MeshStandardMaterial({color: 0x1D2A86, roughness: .6});
+}
+function t3Seat(i, n){ const a = n === 1 ? 0 : (-64 + 128 * i / (n - 1)) * Math.PI / 180, r = 1.55; return {x: Math.sin(a) * r, z: -Math.cos(a) * r, a}; }
+function t3Char(m, i, n){
+  const g = new THREE.Group(), s = t3Seat(i, n), std = T3.mats.std;
+  // 의자
+  const ch = new THREE.Group(), woodM = std(0xC9A882, .7);
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(.5, .05, .46), woodM); seat.position.y = .46; seat.castShadow = seat.receiveShadow = true; ch.add(seat);
+  const backr = new THREE.Mesh(new THREE.BoxGeometry(.5, .5, .05), woodM); backr.position.set(0, .74, -.22); backr.castShadow = true; ch.add(backr);
+  [[-.21, -.19], [.21, -.19], [-.21, .19], [.21, .19]].forEach(([x, z]) => { const l = new THREE.Mesh(new THREE.CylinderGeometry(.02, .02, .46, 8), woodM); l.position.set(x, .23, z); l.castShadow = true; ch.add(l); });
+  g.add(ch);
+  // 몸: 모양별로 구성
+  const body = new THREE.Group(), B = T3.body, add = (geo, x, y, z, sx = 1, sy = 1, sz = 1, mat = B) => { const o = new THREE.Mesh(geo, mat); o.position.set(x, y, z); o.scale.set(sx, sy, sz); o.castShadow = true; body.add(o); return o; };
+  const sph = r => new THREE.SphereGeometry(r, 48, 32);
+  const sh = m.shape || 'orb';
+  if (sh === 'bear'){ add(sph(.27), 0, 0, 0); add(sph(.1), -.2, .22, -.02); add(sph(.1), .2, .22, -.02); }
+  else if (sh === 'drop'){ add(sph(.27), 0, -.02, 0); add(new THREE.ConeGeometry(.2, .28, 40), 0, .26, 0); }
+  else if (sh === 'bean'){ add(sph(.27), 0, 0, 0, 1.12, .92, .95); }
+  else if (sh === 'cloud'){ add(sph(.22), -.11, .02, 0); add(sph(.24), .1, .06, 0); add(sph(.2), 0, -.08, .02, 1.5, .9, 1.1); }
+  else if (sh === 'capsule'){ add(new THREE.CylinderGeometry(.22, .22, .28, 40), 0, 0, 0); add(sph(.22), 0, .14, 0); add(sph(.22), 0, -.14, 0); }
+  else add(sph(.28), 0, 0, 0);
+  // 꾸미기
+  if (m.acc === 'beanie'){ add(new THREE.SphereGeometry(.25, 40, 20, 0, Math.PI * 2, 0, Math.PI / 2), 0, .1, 0, 1.08, 1, 1.08, T3.navy); add(sph(.06), 0, .37, 0, 1, 1, 1, T3.navy); }
+  if (m.acc === 'ribbon'){ const rm = std(0xEC6F64, .5); add(new THREE.ConeGeometry(.06, .12, 16), -.19, .24, .05, 1, 1, 1, rm).rotation.z = Math.PI / 2; add(new THREE.ConeGeometry(.06, .12, 16), -.07, .24, .05, 1, 1, 1, rm).rotation.z = -Math.PI / 2; }
+  // 얼굴: 캔버스 텍스처 판
+  const cv = document.createElement('canvas'); cv.width = cv.height = 256; const tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding;
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(.42, .42), new THREE.MeshBasicMaterial({map: tex, transparent: true, depthWrite: false})); face.position.set(0, .0, .282 * (sh === 'bean' ? .96 : sh === 'capsule' ? .8 : sh === 'cloud' ? 1.05 : 1)); body.add(face);
+  const badge = new THREE.Sprite(new THREE.SpriteMaterial({map: t3Badge('safe'), depthTest: false})); badge.scale.set(.13, .13, 1); badge.position.set(.22, .22, .12); badge.visible = false; body.add(badge);
+  body.scale.setScalar(1.45); body.position.y = .49 + .38; g.add(body);
+  g.position.set(s.x, 0, s.z);
+  g.lookAt(0, 0, 2.6);   // 식탁 너머 카메라 쪽을 본다
+  const o = {g, body, face, cv, tex, badge, st: '', m, base: body.position.y, sc: 1.45, hop: 0, shake: 0, ph: i * .7};
+  return o;
+}
+function t3SetFace(c, st){ if (c.st === st) return; const prev = c.st; c.st = st; t3Face(c.cv.getContext('2d'), st, c.m.acc); c.tex.needsUpdate = true;
+  if (['safe', 'risk', 'warn'].includes(st)){ c.badge.material.map = t3Badge(st); c.badge.material.needsUpdate = true; c.badge.visible = true; } else c.badge.visible = false;
+  if (prev && st === 'risk') c.shake = 1; if (prev && (st === 'safe' || st === 'wave')) c.hop = 1; }
+function t3Food(d){
+  const g = new THREE.Group(), std = T3.mats.std, r = an(DISH[d]), keys = [...r.contains.keys()];
+  const cols = keys.map(k => TCOL[k]).filter(Boolean).map(c => new THREE.Color(c));
+  const FB = [[/크림|까르보|리조또/, '#EED9A6'], [/토마토|떡볶이|짬뽕|마라|제육|김치|순두부|탕수육|피자/, '#C9452A'], [/파스타|국수|라면|우동|소바|잡채|팟타이/, '#E8C77E'], [/김밥|월남쌈/, '#2F3B2C'], [/치킨|돈까스|군만두|크루아상|호떡|호두과자/, '#C98A3E'], [/샐러드|비빔밥|포케/, '#6DA552'], [/불고기|고기|햄버거|간장게장|고등어/, '#8A4B2E'], [/마카롱|티라미수|아이스크림|카스텔라|빙수|탕후루/, '#F2B6C1'], [/밥|오므라이스|죽|정식|초밥|볶음밥/, '#F4ECDC']];
+  const base = new THREE.Color((FB.find(([r]) => r.test(d)) || [0, ['#E9A25E', '#D9874A', '#E3B65A'][d.length % 3]])[1]);
+  if (T3CUP.test(d)){
+    const cup = new THREE.Mesh(new THREE.CylinderGeometry(.075, .06, .17, 32, 1, true), new THREE.MeshPhysicalMaterial({color: 0xFFFFFF, roughness: .1, transmission: .0, clearcoat: 1, side: THREE.DoubleSide})); cup.position.y = .085; cup.castShadow = true; g.add(cup);
+    const liq = new THREE.Mesh(new THREE.CircleGeometry(.07, 32), std(/라떼/.test(d) ? 0xC9A27E : 0xF4C6B8, .3)); liq.rotation.x = -Math.PI / 2; liq.position.y = .15; g.add(liq);
+    return g;
+  }
+  const plate = new THREE.Mesh(new THREE.CylinderGeometry(.24, .2, .025, 48), new THREE.MeshPhysicalMaterial({color: 0xFFFFFF, roughness: .25, clearcoat: .8})); plate.position.y = .013; plate.castShadow = plate.receiveShadow = true; g.add(plate);
+  if (T3SOUP.test(d)){
+    const bowl = new THREE.Mesh(new THREE.SphereGeometry(.16, 40, 20, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), new THREE.MeshPhysicalMaterial({color: 0xFFFFFF, roughness: .2, clearcoat: .8, side: THREE.DoubleSide})); bowl.position.y = .17; bowl.castShadow = true; g.add(bowl);
+    const soup = new THREE.Mesh(new THREE.CircleGeometry(.15, 40), std(/짬뽕|마라|찌개|라면|카레/.test(d) ? (/카레/.test(d) ? 0xD9A23B : 0xD8552E) : 0xEBD7B0, .35)); soup.rotation.x = -Math.PI / 2; soup.position.y = .15; g.add(soup);
+    for (let i = 0; i < 9; i++){ const c = cols[i % Math.max(1, cols.length)] || base; const b = new THREE.Mesh(new THREE.SphereGeometry(.022 + Math.random() * .012, 12, 8), std(c, .6)); const a = Math.random() * 7, rr = Math.random() * .1; b.position.set(Math.cos(a) * rr, .155, Math.sin(a) * rr); b.scale.y = .6; g.add(b); }
+    return g;
+  }
+  const mound = new THREE.Mesh(new THREE.SphereGeometry(.15, 40, 20, 0, Math.PI * 2, 0, Math.PI / 2), std(base.clone().offsetHSL(0, .1, -.05), .6)); mound.scale.set(1, .55, 1); mound.position.y = .025; mound.castShadow = true; g.add(mound);
+  for (let i = 0; i < 12; i++){ const c = cols[i % Math.max(1, cols.length)] || base.clone().offsetHSL(0, 0, -.12); const geo = i % 3 ? new THREE.SphereGeometry(.025, 12, 8) : new THREE.BoxGeometry(.045, .02, .03); const b = new THREE.Mesh(geo, std(c, .55)); const a = Math.random() * 7, rr = Math.random() * .11; b.position.set(Math.cos(a) * rr, .03 + (1 - rr / .15) * .07, Math.sin(a) * rr); b.rotation.y = a; b.castShadow = true; g.add(b); }
+  return g;
+}
+function t3PlatePos(i, k){ const span = k > 1 ? Math.min(1.25, .42 * (k - 1)) : 0, x = -span / 2 + (k > 1 ? span * i / (k - 1) : 0); return {x, z: .32 + (k > 2 && i % 2 ? -.18 : 0)}; }
+function t3Sync(){
+  const M = tblMembers(), key = M.map(m => m.name + m.shape + m.acc).join('|');
+  if (key !== T3.memKey){ T3.chars.forEach(c => T3.scene.remove(c.g)); T3.chars = M.map((m, i) => t3Char(m, i, M.length)); T3.chars.forEach(c => T3.scene.add(c.g)); T3.memKey = key; }
+  M.forEach((m, i) => { const c = T3.chars[i]; c.m = m; const j = tblJudge(m); t3SetFace(c, j.st === 'idle' ? (i % 2 ? 'idle' : 'wave') : j.st); });
+  const dk = TBL.dishes.join('|');
+  if (dk !== T3.dishKey){ const old = T3.plates; T3.plates = TBL.dishes.map((d, i) => { const ex = old.find(p => p.d === d); const ps = t3PlatePos(i, TBL.dishes.length); if (ex){ ex.to = ps; return ex; } const g = t3Food(d); g.position.set(ps.x, 1.6, ps.z); T3.scene.add(g); return {d, g, to: ps, vy: 0, land: false}; });
+    old.filter(p => !T3.plates.includes(p)).forEach(p => T3.scene.remove(p.g)); T3.dishKey = dk; }
+}
+function t3Mount(){
+  const box = $('tbl3c'); if (!box) return false;
+  if (!window.THREE) return false;
+  if (!T3.r){
+    T3.r = new THREE.WebGLRenderer({antialias: true}); T3.r.setPixelRatio(Math.min(2, devicePixelRatio || 1)); T3.r.outputEncoding = THREE.sRGBEncoding; T3.r.toneMapping = THREE.ACESFilmicToneMapping; T3.r.toneMappingExposure = .82; T3.r.shadowMap.enabled = true; T3.r.shadowMap.type = THREE.PCFSoftShadowMap;
+    T3.cam = new THREE.PerspectiveCamera(36, 1, .1, 60); t3Build();
+    const cv = T3.r.domElement; cv.className = 't3c';
+    cv.addEventListener('pointerdown', e => { T3.drag = {x: e.clientX, y0: T3.yawT, moved: false}; try { cv.setPointerCapture(e.pointerId); } catch (_) {} });
+    cv.addEventListener('pointermove', e => { if (!T3.drag) return; const dx = e.clientX - T3.drag.x; if (Math.abs(dx) > 4) T3.drag.moved = true; T3.yawT = Math.max(-.45, Math.min(.45, T3.drag.y0 - dx * .004)); });
+    cv.addEventListener('pointerup', e => { const d = T3.drag; T3.drag = null; if (d && !d.moved) t3Pick(e); });
+    window.addEventListener('resize', t3Resize);
+  }
+  box.appendChild(T3.r.domElement); t3Sync(); t3Resize(); T3.last = performance.now(); T3.ok = true; T3.r.setAnimationLoop(t3Frame); return true;
+}
+function t3Resize(){ const b = $('tbl3c'); if (!b || !T3.r) return; const w = b.clientWidth, h = b.clientHeight; T3.r.setSize(w, h, false); T3.cam.aspect = w / Math.max(1, h); T3.cam.fov = w < 560 ? 44 : 36; T3.cam.updateProjectionMatrix(); }
+function t3Pick(e){
+  const cv = T3.r.domElement, r = cv.getBoundingClientRect(), v = new THREE.Vector2((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), ray = new THREE.Raycaster(); ray.setFromCamera(v, T3.cam);
+  const pl = T3.plates.find(p => ray.intersectObject(p.g, true).length); if (pl){ tblAdd(pl.d); return; }
+  const ci = T3.chars.findIndex(c => ray.intersectObject(c.body, true).length); if (ci >= 0){ const m = tblMembers()[ci]; snd(T3.chars[ci].st === 'risk' ? 'risk' : 'tick'); T3.chars[ci].hop = 1; toast(`${m.name}: ${m.allergies.length ? m.allergies.join(', ') + ' 알레르기' : '알레르기 없음'}`); }
+}
+function t3Frame(now){
+  const box = $('tbl3c'); if (!box || !box.contains(T3.r.domElement)){ T3.r.setAnimationLoop(null); T3.ok = false; return; }
+  const dt = Math.min(.05, (now - T3.last) / 1000); T3.last = now; T3.t += dt;
+  // 카메라: 살짝 숨 쉬듯 흔들리고, 드래그로 좌우를 돌아본다
+  T3.yaw += (T3.yawT + Math.sin(T3.t * .25) * .04 - T3.yaw) * Math.min(1, dt * 4);
+  const narrow = box.clientWidth < 560, R = narrow ? 4.4 : 4.3, H = narrow ? 3.0 : 3.0;
+  T3.cam.position.set(Math.sin(T3.yaw) * R, H, Math.cos(T3.yaw) * R); T3.cam.lookAt(0, narrow ? 1.5 : .72, -.35);
+  T3.chars.forEach(c => { const b = c.body; let y = c.base + Math.sin(T3.t * 2 + c.ph) * .012;
+    if (c.st === 'safe' || c.st === 'wave') y += Math.abs(Math.sin(T3.t * 4 + c.ph)) * .035;
+    if (c.hop > 0){ c.hop = Math.max(0, c.hop - dt * 1.6); y += Math.sin(c.hop * Math.PI) * .18; }
+    b.position.y = y; b.rotation.z = c.shake > 0 ? Math.sin(c.shake * 40) * .18 * c.shake : 0; if (c.shake > 0) c.shake = Math.max(0, c.shake - dt * 1.4);
+    b.scale.set(c.sc * (1 + Math.sin(T3.t * 2 + c.ph) * .012), c.sc * (1 - Math.sin(T3.t * 2 + c.ph) * .012), c.sc); });
+  T3.plates.forEach(p => { const g = p.g; g.position.x += (p.to.x - g.position.x) * Math.min(1, dt * 8); g.position.z += (p.to.z - g.position.z) * Math.min(1, dt * 8);
+    if (!p.land){ p.vy -= 9.8 * dt; g.position.y += p.vy * dt; if (g.position.y <= .785){ g.position.y = .785; if (Math.abs(p.vy) > 1.2){ p.vy = -p.vy * .32; } else { p.vy = 0; p.land = true; } } } });
+  T3.r.render(T3.scene, T3.cam);
+  if (!T3.tagT || now - T3.tagT > 60){ T3.tagT = now; t3Tags(); }
+}
+function t3Tags(){
+  const el = $('tblTags'), box = $('tbl3c'); if (!el || !box) return; const W = box.clientWidth, H = box.clientHeight, v = new THREE.Vector3(), M = tblMembers();
+  const P = (x, y, z) => { v.set(x, y, z).project(T3.cam); return {x: (v.x + 1) / 2 * W, y: (1 - v.y) / 2 * H, ok: v.z < 1}; };
+  let h = '';
+  T3.chars.forEach((c, i) => { const m = M[i]; if (!m) return; const wp = new THREE.Vector3(); c.body.getWorldPosition(wp); const top = P(wp.x, wp.y + .55, wp.z); const j = tblJudge(m);
+    h += `<span class="t3-bub ${c.st}" style="left:${top.x.toFixed(0)}px;top:${top.y.toFixed(0)}px"><b>${esc(m.name)}${m.me ? ' (나)' : ''}<small>${m.allergies.length ? m.allergies.slice(0, 3).map(esc).join(' · ') : '알레르기 없음'}</small></b>${esc(tblLine(m, j))}</span>`; });
+  T3.plates.forEach(p => { const g = p.g.position, a = P(g.x, g.y + .2, g.z), b = P(g.x, g.y - .02, g.z + .25), w = M.filter(m => judge(DISH[p.d], m.allergies) === 'risk');
+    h += `<span class="t3-dish" style="left:${a.x.toFixed(0)}px;top:${a.y.toFixed(0)}px">${esc(p.d)}</span>${w.length ? `<span class="t3-no" style="left:${b.x.toFixed(0)}px;top:${b.y.toFixed(0)}px">${w.map(m => esc(m.name)).join('·')} ✕</span>` : ''}`; });
+  el.innerHTML = h;
+}
 /* ================= 함께 먹기 패널 ================= */
 function groupPanel(){
   const G = S.group, mine = myList();
@@ -2474,11 +2825,11 @@ function viewAR(){
   arCompute();
   const mine = myList(), safeN = AR.skus.filter(s => s.v === 'safe').length;
   const head = `<div class="ph"><div><span class="k">02 · Space</span><h1>응급 지도</h1><p>지금 위치에서 가장 가까운 응급실과 약국을 실제 지도와 거리 사진으로 보여줘요. 응급번호, 내 주소, 현지어 문장도 함께 열려요.</p></div>
-    <div class="seg"><button aria-pressed="${ui.arMode === 'radar'}" data-armode="radar">응급실 찾기</button><button aria-pressed="${ui.arMode === 'cam'}" data-armode="cam">바코드 카메라</button></div></div>`;
+</div>`;
   const myBox = `<section class="panel"><div class="ptitle"><h2><span class="no">MY</span>내 알레르기</h2><span class="note">${mine.length}개</span></div><div class="pbody"><div class="agrid sm">${AL.map(a => `<button aria-pressed="${S.allergies.includes(a.k)}" data-al="${esc(a.k)}"><span>${esc(a.k)}</span></button>`).join('')}</div>
     <div class="legend" style="margin-top:12px"><span><i class="d safe"></i>안전</span><span><i class="d warn"></i>섞일 수 있음</span><span><i class="d risk"></i>들어 있음</span><span><i class="d none"></i>기준 없음</span></div></div></section>`;
-  if (ui.arMode !== 'cam') ui.arMode = 'radar';
-  if (ui.arMode === 'cam'){
+  ui.arMode = 'radar';
+  if (false){
     const h = ui.arHit; let card = '';
     if (h){ if (h.miss) card = `<div class="arcard"><div class="m">${mascot('think', S.tint, 'glasses')}</div><div><b>모르는 바코드예요</b><p class="note">${esc(h.miss)}</p></div><button class="del x" data-act="arhitx" aria-label="닫기">×</button></div>`;
       else { const r = analyzeLabel(h.ing), s = {r, v: r.overall}; card = `<div class="arcard ${s.v}"><div class="m">${mascot(s.v, S.tint, 'glasses')}</div><div><span class="mono note">${h.code}</span><b>${esc(h.name)}</b><p>${stTag(s.v === 'none' ? 'none' : s.v, esc(vText(s)))}</p></div><button class="del x" data-act="arhitx" aria-label="닫기">×</button></div>`; } }
@@ -3175,8 +3526,8 @@ function r3Hud(){
 const MTABS = [['home','홈','home'],['log','기록','log'],['ar','스캔','scan'],['card','비상','card'],['me','내 정보','me']];
 const MODES = [['code','바코드'],['label','성분표'],['radar','응급 지도'],['meal','급식표']];
 function appChrome(){
-  const rel = RECALLS.filter(r => r.k.some(k => myList().includes(k))).length, sub = ui.view === 'scan' || ui.view === 'recall' || ui.view === 'travel';
-  const title = {home:'', log:'기록', ar:'스캔', card:'비상 카드', me:'내 정보', scan:'성분 분석', recall:'회수 알림', travel:'여행 모드'}[ui.view];
+  const rel = RECALLS.filter(r => r.k.some(k => myList().includes(k))).length, sub = ui.view === 'scan' || ui.view === 'recall' || ui.view === 'travel' || ui.view === 'table';
+  const title = {home:'', log:'기록', ar:'스캔', card:'비상 카드', me:'내 정보', scan:'성분 분석', recall:'회수 알림', travel:'여행 모드', table:'함께 먹는 식탁'}[ui.view];
   document.querySelector('.hb').innerHTML = sub
     ? `<button class="mback" data-go="${ui.back || 'home'}" aria-label="뒤로">${'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>'}</button><b class="mtitle">${title}</b><span style="width:40px"></span>`
     : `${ui.view === 'home' ? `<span class="wm"><span id="wmM" style="width:28px;height:28px;display:block">${mascot('idle')}</span><b>TRACE</b></span>` : `<b class="mtitle large">${title}</b>`}
@@ -3198,6 +3549,7 @@ function homeM(){
   <section class="mscanc"><div class="mscanc-h"><b>스캔하기</b><span>카메라로 비추면 바로 판정해요</span></div>
     <div class="mmodes">${MODES.map(([k, n]) => `<button data-mgo="${k}"><span class="ic">${icon({code:'scan', label:'text', radar:'map', meal:'log'}[k], 22)}</span>${n}</button>`).join('')}</div></section>
   ${rel.length ? `<button class="mrow alert" data-go="recall"><span class="mdot risk"></span><div><b>내 알레르기 관련 회수 ${rel.length}건</b><span>${esc(rel[0].p)} · ${esc(rel[0].r)}</span></div><span class="chev">›</span></button>` : ''}
+  <button class="mrow tblrow" data-go="table"><span class="ic2">${icon('me', 20)}</span><div><b>함께 먹는 식탁</b><span>친구들의 레이와 한 상 차리기 · ${S.group.length + 1}명</span></div><span class="chev">›</span></button>
   <button class="mrow trip" data-go="travel"><span class="ic2">${icon('globe', 20)}</span><div><b>${trip() ? trip().n + ' 여행 중 · 응급 ' + trip().em : '여행 모드'}</b><span>현지어 성분표 · 식당에서 보여줄 문장 · 현지 응급번호</span></div><span class="chev">›</span></button>
   <button class="mrow" data-go="log"><span class="mdot ${done ? 'safe' : 'pri'}"></span><div><b>${done ? '오늘 체크인 완료' : '오늘 체크인 30초'}</b><span>${done ? '반응 기록과 함께 패턴을 찾고 있어요' : '수면 · 컨디션 · 스트레스를 골라 주세요'}</span></div><span class="chev">›</span></button>
   <section class="mcard"><div class="mcard-h"><b>내 알레르기</b><button class="mlink" data-go="me">편집</button></div><div class="mchips wrap">${mine.length ? mine.map(k => `<span class="chip" aria-pressed="true">${esc(k)}</span>`).join('') : '<span class="note">아직 없어요. 내 정보에서 등록해 주세요.</span>'}</div></section>`;
@@ -3281,8 +3633,8 @@ function meM(){
 }
 
 /* ================= 렌더 ================= */
-const TABS = [['home','홈'],['scan','성분 분석'],['travel','여행'],['ar','응급 지도'],['log','기록'],['card','비상 카드'],['me','내 정보']];
-const DOCK = [['home','홈'],['scan','분석'],['ar','AR'],['log','기록'],['me','내 정보']];
+const TABS = [['home','홈'],['scan','성분 분석'],['travel','여행'],['ar','응급 지도'],['table','함께 식탁'],['log','기록'],['card','비상 카드'],['me','내 정보']];
+const DOCK = [['home','홈'],['scan','분석'],['ar','지도'],['log','기록'],['me','내 정보']];
 function render(){
   document.body.classList.toggle('lg', !!S.lg);
   const rel = RECALLS.filter(r => r.k.some(k => myList().includes(k))).length;
@@ -3291,10 +3643,10 @@ function render(){
   $('dock').innerHTML = DOCK.map(([v, n]) => `<button data-go="${v}" ${ui.view === v ? 'aria-current="page"' : ''}>${icon(v, 22)}<span>${n}</span></button>`).join('');
   $('lgb').setAttribute('aria-pressed', String(!!S.lg)); const sb = $('sndb'); if (sb){ sb.innerHTML = sndIcon(S.snd); sb.setAttribute('aria-pressed', String(!!S.snd)); sb.setAttribute('aria-label', S.snd ? '효과음 끄기' : '효과음 켜기'); }
   $('wmM').innerHTML = mascot('idle'); }
-  const V = (APP ? {home: homeM, ar: scanM, log: logM, card: cardM, me: meM} : {})[ui.view] || {home: viewHome, scan: viewScan, ar: viewAR, travel: viewTravel, map: viewMap, recall: viewRecall, log: viewLog, card: viewCard, me: viewMe}[ui.view];
+  const V = (APP ? {home: homeM, ar: scanM, log: logM, card: cardM, me: meM} : {})[ui.view] || {home: viewHome, scan: viewScan, ar: viewAR, travel: viewTravel, table: viewTable, map: viewMap, recall: viewRecall, log: viewLog, card: viewCard, me: viewMe}[ui.view];
   $('app').innerHTML = V() + `<div class="foot"><span>TRACE · 성분표 분석과 알레르기 관리 시안</span><span>제품·회수·메뉴 정보는 예시 데이터예요</span></div>`;
   if (ui.cam) attachCam();
-  rdMount(); r3Mount();
+  rdMount(); r3Mount(); t3Mount();
   renderGuide();
   if (ui.ob.stage === 'setup') renderIntro();
   ui.fresh = false;
@@ -3308,7 +3660,7 @@ document.addEventListener('pointerdown', e => { const b = e.target.closest && e.
 document.addEventListener('click', e => {
   const t = e.target, q = s => t.closest(s);
   let el;
-  if ((el = q('[data-go]'))){ stopCam(); if (APP && (el.dataset.go === 'recall' || el.dataset.go === 'scan' || el.dataset.go === 'travel')) ui.back = ui.view; ui.mlog = false; ui.view = el.dataset.go; ui.big = false; ui.gOpen = false; ui.arHit = null; render(); window.scrollTo({top: 0}); return; }
+  if ((el = q('[data-go]'))){ stopCam(); if (APP && (el.dataset.go === 'recall' || el.dataset.go === 'scan' || el.dataset.go === 'travel' || el.dataset.go === 'table')) ui.back = ui.view; ui.mlog = false; ui.view = el.dataset.go; ui.big = false; ui.gOpen = false; ui.arHit = null; render(); window.scrollTo({top: 0}); return; }
   if ((el = q('[data-go2]'))){ stopCam(); const [v, src] = el.dataset.go2.split(':'); if (APP && v === 'scan'){ ui.view = 'ar'; ui.arMode = src === 'code' ? 'code' : 'label'; render(); return; } ui.view = v; ui.src = src; ui.gOpen = false; render(); window.scrollTo({top: 0}); return; }
   if ((el = q('[data-ob]'))){ const a = el.dataset.ob, o = ui.ob, box = $('intro');
     if (a === 'skip' || a === 'finish'){ S.onboarded = true; save(); o.stage = null; ui.view = 'home'; render(); renderIntro(); window.scrollTo({top: 0}); return; }
@@ -3341,6 +3693,9 @@ document.addEventListener('click', e => {
   if ((el = q('[data-gdel]'))){ S.group.splice(+el.dataset.gdel, 1); save(); render(); return; }
   if ((el = q('[data-gal]'))){ const k = el.dataset.gal, g = ui.gNew; g.allergies = g.allergies.includes(k) ? g.allergies.filter(x => x !== k) : g.allergies.concat(k); el.setAttribute('aria-pressed', g.allergies.includes(k)); return; }
   if ((el = q('[data-arf]'))){ AR.filter = el.dataset.arf === '1'; render(); return; }
+  if ((el = q('[data-tbladd]'))){ tblAdd(el.dataset.tbladd); return; }
+  if ((el = q('[data-tbldel]'))){ tblAdd(el.dataset.tbldel); return; }
+  if ((el = q('[data-tblwho]'))){ const m = tblMembers()[+el.dataset.tblwho], j = tblJudge(m); snd(j.st === 'risk' ? 'risk' : 'tick'); toast(`${m.name}: ${m.allergies.length ? m.allergies.join(', ') + ' 알레르기' : '알레르기 없음'}`); return; }
   if ((el = q('[data-r3sp]'))){ R3.speed = +el.dataset.r3sp; snd('tick'); r3Btns(); return; }
   if ((el = q('[data-rdf]'))){ ui.rdF = el.dataset.rdf; snd('tick'); const T = rdTarget(), f = ui.rdF; if (f !== 'all' && T && (f === 'er') === (T.t === 'rx')){ const n = rdPlaces().find(x => f === 'er' ? x.t !== 'rx' : x.t === 'rx'); if (n) rdSetTarget(n.id); } render(); return; }
   if ((el = q('[data-rdsel]'))){ snd('lock'); rdSetTarget(el.dataset.rdsel); RD.mkKey = ''; rdSlow(true); return; }
@@ -3393,6 +3748,8 @@ document.addEventListener('click', e => {
     if (a === 'grp'){ ui.grpOn = !ui.grpOn; render(); toast(ui.grpOn ? `${members().length}명 기준으로 바꿨어요` : '내 기준으로 돌아왔어요'); }
     if (a === 'gadd'){ ui.gNew = {name: '', allergies: []}; render(); const n = $('gname'); if (n) n.focus(); }
     if (a === 'gcancel'){ ui.gNew = null; render(); }
+    if (a === 'tblsug'){ const L = tblSuggest(); if (!L.length){ snd('err'); toast('모두가 먹을 수 있는 메뉴를 찾지 못했어요'); } else { const pick = L.sort(() => Math.random() - .5).slice(0, 3); TBL.dishes = pick; TBL.last = pick[pick.length - 1]; render(); snd('arrive'); } }
+    if (a === 'tblclr'){ TBL.dishes = []; TBL.last = ''; snd('close'); render(); }
     if (a === 'ciredo'){ ui.ciRedo = true; ui.ci = {step: 0, ans: Object.assign({}, S.daily[ymd(today0)] || {})}; render(); }
     if (a === 'ciback'){ ui.ci.step = Math.max(0, ui.ci.step - 1); render(); }
     if (a === 'intro'){ ui.ob = {stage: 'land', step: 0}; renderIntro(); $('intro').scrollTop = 0; }
