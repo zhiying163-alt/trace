@@ -17,6 +17,7 @@
   --safe:#24A05E; --safe-bg:#E2F6EA; --warn:#D48A16; --warn-bg:#FDF0DA; --risk:#E5484D; --risk-bg:#FDE8E7;
   --sans:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
   --w:520px;
+  --ease-out:cubic-bezier(.23,1,.32,1); --ease-in-out:cubic-bezier(.77,0,.175,1); --ease-drawer:cubic-bezier(.32,.72,0,1);
 }
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -205,8 +206,8 @@ label.t{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin:0 
 .vf{position:absolute;left:12%;right:12%;top:36%;height:22%;}
 .vf i{position:absolute;width:26px;height:26px;border:3px solid #fff;border-radius:4px}
 .vf i:nth-child(1){left:0;top:0;border-right:0;border-bottom:0}.vf i:nth-child(2){right:0;top:0;border-left:0;border-bottom:0}.vf i:nth-child(3){left:0;bottom:0;border-right:0;border-top:0}.vf i:nth-child(4){right:0;bottom:0;border-left:0;border-top:0}
-.vf .ln{position:absolute;left:6%;right:6%;top:50%;height:2px;background:#FF5E62;box-shadow:0 0 12px #FF5E62;animation:scanl 1.8s ease-in-out infinite}
-@keyframes scanl{0%,100%{transform:translateY(-30px)}50%{transform:translateY(30px)}}
+.vf .ln{position:absolute;left:6%;right:6%;top:50%;height:2px;background:#FF5E62;box-shadow:0 0 12px #FF5E62;animation:vfscan 1.8s var(--ease-in-out) infinite}
+@keyframes vfscan{0%,100%{transform:translateY(-30px)}50%{transform:translateY(30px)}}
 .stage .tl{position:absolute;left:14px;top:14px;color:#fff;font-size:12px;display:flex;flex-direction:column;gap:2px}
 .stage .tl b{font-family:var(--mono);font-weight:500;letter-spacing:.14em;font-size:11px;display:flex;align-items:center;gap:6px}
 .stage .tl b i{width:7px;height:7px;border-radius:50%;background:#FF5E62;animation:blink 1.2s infinite}
@@ -215,8 +216,8 @@ label.t{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin:0 
 .stage .shut button{width:64px;height:64px;border-radius:50%;border:4px solid rgba(255,255,255,.85);background:rgba(255,255,255,.18);display:grid;place-items:center}
 .stage .shut button span{width:46px;height:46px;border-radius:50%;background:#fff}
 .stage .shut p{margin:0;opacity:.85}
-.ar-tag{position:absolute;left:50%;top:13%;transform:translateX(-50%);width:min(86%,330px);background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-radius:20px;padding:12px 14px 6px;box-shadow:0 18px 40px rgba(0,0,0,.35);animation:pop .35s cubic-bezier(.3,1.5,.5,1)}
-@keyframes pop{from{transform:translate(-50%,10px) scale(.9);opacity:0}}
+.ar-tag{position:absolute;left:50%;top:13%;transform:translateX(-50%);width:min(86%,330px);background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-radius:20px;padding:12px 14px 6px;box-shadow:0 18px 40px rgba(0,0,0,.35);animation:arpop .3s var(--ease-out);transform-origin:50% 100%}
+@keyframes arpop{from{transform:translate(-50%,6px) scale(.95);opacity:0}}
 .ar-tag::after{content:'';position:absolute;left:50%;bottom:-9px;width:18px;height:18px;background:inherit;transform:translateX(-50%) rotate(45deg);border-radius:3px}
 .ar-tag .hd{display:flex;align-items:center;gap:8px}
 .ar-tag .hd b{font-size:14px;flex:1}
@@ -449,8 +450,6 @@ canvas.wf{position:absolute;left:0;top:0;width:100%;height:100%;z-index:0;pointe
 }
 /* 인터랙션 */
 .btn,.chip,.seg button,.optg button,.prods button,.plc,.row,.tg,.act .on,.search .go{position:relative;overflow:hidden}
-.rp{position:absolute;border-radius:50%;pointer-events:none;background:currentColor;opacity:.2;transform:scale(0);animation:rp .6s ease-out forwards}
-@keyframes rp{to{transform:scale(1);opacity:0}}
 .squish{animation:squish .55s cubic-bezier(.3,1.6,.5,1)!important}
 @keyframes squish{0%{transform:scale(1)}30%{transform:scale(1.18,.84)}60%{transform:scale(.94,1.07)}100%{transform:scale(1)}}
 @keyframes pop{from{transform:scale(.85) translateY(8px);opacity:0}}
@@ -877,6 +876,79 @@ html.web #wglow{width:min(640px,60vw)}
 .chibi3d{width:auto;height:160px;transform-origin:50% 100%;animation:cbhop 2.4s ease-in-out infinite;filter:drop-shadow(0 10px 10px rgba(40,52,170,.12))}
 @keyframes cbhop{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-6px) rotate(-2deg)}60%{transform:translateY(0) rotate(1.5deg)}}
 
+/* ===== 모션 · 디테일 다듬기 (Emil Kowalski 'animate' · Jakub Krehel 'make interfaces feel better') ===== */
+/* 1) 누르면 살짝 줄어든다: 리플 대신 transform 하나로, 빠르고 끊기지 않게 */
+.btn,.chip,.seg button,.optg button,.prods button,.pdays button,.act,.act .on,.tg,.ob-opts button,.ib,.back,.sos,.search .go,.link,.swf,.lx-more,.lx-ctl button,#gameBox .gx,.step button,.pitem .del,.sheet .x,.dock button:not(.fab),.gb-go{transition:transform .16s var(--ease-out),background-color .2s var(--ease-out),border-color .2s var(--ease-out),color .2s var(--ease-out),box-shadow .2s var(--ease-out)}
+.btn:active,.chip:active,.seg button:active,.optg button:active,.prods button:active,.pdays button:active,.act .on:active,.ob-opts button:active,.ib:active,.back:active,.sos:active,.search .go:active,.link:active,.swf:active,.lx-more:active,.lx-ctl button:active,#gameBox .gx:active,.step button:active,.pitem .del:active,.sheet .x:active,.dock button:not(.fab):active{transform:scale(.97)}
+.row,.plc,.tg,.act,.game-card,.gbanner{transition:transform .2s var(--ease-out),box-shadow .3s var(--ease-out),border-color .2s var(--ease-out),background-color .2s var(--ease-out)}
+.row:active,.plc:active,.tg:active,.act:active,.game-card:active{transform:scale(.985)}
+.gbanner:active{transform:scale(.99)}
+.dock .fab span{transition:transform .16s var(--ease-out),background-color .2s var(--ease-out)}
+/* 2) 화면 전환: 처음 한 번만, 위에서부터 차례로 짧게 */
+main{animation:none}
+.vin>*:not(.sheet):not(.sheet-bg),.vin>.lay>*{animation:vin .4s var(--ease-out) backwards}
+.vin>*:nth-child(2),.vin>.lay>*:nth-child(2){animation-delay:.05s}
+.vin>*:nth-child(3){animation-delay:.1s}
+.vin>*:nth-child(4){animation-delay:.14s}
+.vin>*:nth-child(5){animation-delay:.18s}
+.vin>*:nth-child(n+6){animation-delay:.22s}
+@keyframes vin{from{opacity:0;transform:translateY(8px)}}
+/* 3) 바텀시트: 서랍처럼 올라오고, 닫힐 때도 내려간다 · 다시 그릴 때는 가만히 */
+.sheet{animation:shin .44s var(--ease-drawer)}
+@keyframes shin{from{transform:translate(-50%,100%)}}
+.sheet-bg{animation:fade .3s var(--ease-out)}
+.sheet.out{animation:shout .22s var(--ease-drawer) forwards;pointer-events:none}
+@keyframes shout{to{transform:translate(-50%,100%)}}
+.sheet-bg.out{animation:fadeout .22s var(--ease-out) forwards;pointer-events:none}
+@keyframes fadeout{to{opacity:0}}
+html.web .sheet{animation:mdin .24s var(--ease-out)}
+@keyframes mdin{from{transform:translate(-50%,-50%) scale(.96);opacity:0}}
+html.web .sheet.out{animation:mdout .16s var(--ease-out) forwards}
+@keyframes mdout{to{transform:translate(-50%,-50%) scale(.97);opacity:0}}
+.sheet.still,.sheet-bg.still,html.web .sheet.still{animation:none}
+/* 4) 토스트: 아래에서 살짝 커지며 등장, 나갈 땐 더 빠르게 */
+.toast{transform:translate(-50%,10px) scale(.96);transition:opacity .16s var(--ease-out),transform .16s var(--ease-out)}
+.toast.show{transform:translate(-50%,0);transition-duration:.24s,.4s}
+/* 5) 스위치·폼: 레이아웃 대신 transform, 속성은 하나씩 지정 */
+.sw{transition:background-color .2s var(--ease-out)}
+.sw i{left:3px;transition:transform .22s var(--ease-out)}
+[aria-checked="true"] .sw i,.sw[aria-checked="true"] i{left:3px;transform:translateX(17px)}
+input[type=text],input[type=number],input[type=tel],textarea,select{transition:border-color .15s var(--ease-out),box-shadow .15s var(--ease-out)}
+.search{transition:box-shadow .2s var(--ease-out)}
+.search:focus-within{box-shadow:0 0 0 4px var(--pri-bg),0 6px 18px rgba(63,81,230,.12)}
+.lx-gal figcaption{transition:opacity .25s var(--ease-out),transform .25s var(--ease-out)}
+.rv,.lx-sl .lx-copy>*,.lx-sl,.lx-hd,.in-top{transition-timing-function:var(--ease-out)}
+.ob-m{animation:obpop .4s var(--ease-out) both,bob 3.2s .4s ease-in-out infinite}
+@keyframes obpop{from{transform:scale(.92) translateY(6px);opacity:0}}
+/* 6) 겹친 둥근 모서리는 동심원으로: 바깥 = 안쪽 + 여백 */
+.search .go{border-radius:10px}
+.tray{border-radius:22px}.tray .btn{border-radius:10px}
+.ph-in{border-radius:31px}
+.seg{border-radius:12px}.seg button{border-radius:9px}
+/* 7) 카드 테두리 → 반투명 그림자 선: 어떤 배경 위에서도 자연스럽게 */
+.card,.pred,.row,.swc,.myth details,.swsteps li{border-color:transparent;box-shadow:0 0 0 1px rgba(26,32,80,.07),0 1px 2px rgba(26,32,80,.04),0 6px 20px rgba(48,62,190,.05)}
+.row.alert{border-color:transparent;box-shadow:0 0 0 1px rgba(229,72,77,.2),0 1px 2px rgba(229,72,77,.06)}
+.swc.flash{box-shadow:0 0 0 3px var(--pri),0 6px 20px rgba(48,62,190,.08)}
+/* 8) 이미지 가장자리에 아주 옅은 안쪽 선 */
+.lx-gal figure::after,.gbanner::after,.cg-v::after{content:'';position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(10,16,60,.08);pointer-events:none}
+.gbanner::after{z-index:2}
+/* 9) 바뀌는 숫자는 고정 폭으로: 카운트업·타이머가 흔들리지 않게 */
+.nums b,.today b,.delta b,.ring b,.lrow .v,.in-stats b,.lx-nums b,.bar b,.step span,.gin input,.swc-n b,.call b,.sw-facts b,.swx b,.lv-sw b,.v-cgm b,.in-n span,.plc .d,.act .d,.lev .lr>span em,.tips li b{font-variant-numeric:tabular-nums}
+/* 10) 작은 버튼은 보이는 크기는 그대로, 누르는 영역만 넓게 */
+.pitem .del,.step button,.sheet .x,.link{position:relative}
+.pitem .del::after,.step button::after,.sheet .x::after,.link::after{content:'';position:absolute;inset:-7px}
+.step button::after{inset:-7px -2px}
+/* 11) 뒤에 화살표가 붙은 버튼은 오른쪽 여백을 살짝 줄여 시각적 중심을 맞춘다 */
+.gb-go{padding:0 16px 0 20px}
+.btn.lg:has(>svg:last-child:not(:first-child)){padding-right:20px}
+/* 12) 터치 기기에서는 hover 이동 효과를 끈다 (탭한 뒤 들뜬 채로 남지 않게) */
+@media (hover:none),(pointer:coarse){
+  .lx-cat:hover,.lx-mc:hover,.btn.wh:hover,.lx-row:hover .lv,.ix-row.in .in-v:hover{transform:none}
+  .gbanner:hover img,.lx-cat:hover .cg-img,.lx-gal figure:hover img{transform:none}
+  .gbanner:hover .gb-go,.lx-more:hover svg,.lx-ann:hover svg{transform:none}
+  .ib:hover{background:none}
+}
+@media (prefers-reduced-motion:reduce){.vin>*,.vin>.lay>*{animation:none!important}}
 </style>
 </head>
 <body>
@@ -1349,11 +1421,24 @@ function chrome(){
   $('dock').innerHTML = DOCK.map(([v, n, ic]) => v === 'scan' ? `<button class="fab" data-go="scan" aria-label="스캔" ${ui.view === v ? 'aria-current="page"' : ''}><span>${icon('scan', 26)}</span></button>` : `<button data-go="${v}" ${ui.view === v ? 'aria-current="page"' : ''}>${icon(ic, 22)}<span>${n}</span></button>`).join('');
   document.documentElement.dataset.view = ui.view;
 }
+function closeSheet(){
+  const app = $('app'), sh = app.querySelector('.sheet:not(.out)');
+  ui.sheet = null; snd('close');
+  if (!sh || FX.RM){ render(); return; }
+  sh.classList.replace('still', 'out') || sh.classList.add('out'); const bg = app.querySelector('.sheet-bg'); bg.classList.remove('still'); bg.classList.add('out');
+  clearTimeout(closeSheet._t); closeSheet._t = setTimeout(render, 220);
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && ui.sheet) closeSheet(); });
 function render(){
   document.body.classList.toggle('lg', !!S.lg);
   chrome();
   const V = {plan: planV, sweet: sweetV, home: homeV, scan: scanV, sim: simV, log: logV, sos: sosV, me: meV, town: townV}[ui.view] || homeV;
-  $('app').innerHTML = V() + (ui.sheet ? ui.sheet() : '') + (WEB ? siteFoot() : '');
+  const app = $('app'), was = app.querySelector('.sheet:not(.out)'), shY = was ? was.scrollTop : 0, nv = render.v !== ui.view; render.v = ui.view;
+  app.innerHTML = V() + (ui.sheet ? ui.sheet() : '') + (WEB ? siteFoot() : '');
+  // 열려 있던 시트는 다시 그려도 올라오는 애니메이션을 반복하지 않는다
+  const sh = app.querySelector('.sheet'); if (sh && was){ sh.classList.add('still'); app.querySelector('.sheet-bg').classList.add('still'); sh.scrollTop = shY; }
+  // 화면이 바뀔 때만 내용이 순서대로 떠오른다
+  if (nv && !FX.RM){ app.classList.remove('vin'); void app.offsetWidth; app.classList.add('vin'); clearTimeout(render._t); render._t = setTimeout(() => app.classList.remove('vin'), 700); }
   if (ui.cam) attachCam();
   kmMount();
   fxBind();
@@ -1400,7 +1485,7 @@ document.addEventListener('click', e => {
   if ((el = q('[data-act]'))){ const a = el.dataset.act;
     if (a === 'famsms'){ if (!S.fam) toast('받는 사람을 직접 골라 주세요'); return; }
     e.preventDefault();
-    if (a === 'sheetx'){ ui.sheet = null; snd('close'); render(); }
+    if (a === 'sheetx') closeSheet();
     if (a === 'snd'){ S.snd = !S.snd; save(); if (S.snd) snd('ping'); render(); }
     if (a === 'lg'){ S.lg = !S.lg; save(); render(); }
     if (a === 'intro'){ ui.ob = {stage: 'land', step: 0}; renderIntro(); }
@@ -2033,9 +2118,6 @@ document.addEventListener('scroll', e => {
 }, {capture: true, passive: true});
 document.addEventListener('pointerdown', e => {
   if (FX.RM) return;
-  const el = e.target.closest('.btn,.chip,.seg button,.optg button,.ob-opts button,.prods button,.plc,.row,.tg,.on,.go');
-  if (el){ const r = el.getBoundingClientRect(), s = Math.max(r.width, r.height) * 2.2, sp = document.createElement('span'); sp.className = 'rp';
-    sp.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX - r.left - s / 2}px;top:${e.clientY - r.top - s / 2}px`; el.appendChild(sp); setTimeout(() => sp.remove(), 650); }
   const m = e.target.closest('.hero .m,.pred-h .m,.vhero .m,.in-end .m,.ob-m,.prof .m,.empty .m,.sos-top .m,.wm .m');
   if (m){ m.classList.remove('squish'); void m.offsetWidth; m.classList.add('squish'); }
 }, true);
